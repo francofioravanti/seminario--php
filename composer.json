@@ -1,0 +1,7 @@
+{
+    "name": "kangu/seminario-php",
+    "require": {
+        "slim/slim": "^4.0",
+        "slim/psr7": "^1.7"
+    }
+}
