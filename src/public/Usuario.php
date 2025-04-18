@@ -105,6 +105,7 @@ class Usuario{
         return count($errores) === 0;
     }
     
+    //esta mal tener dos metodos que hacen lo mismo pero de diferente manera? uno por usuario  y otro por token.
     public function estaLogueado(string $usuario):bool{
         $db = (new Conexion())->getDb();
         $stmt = $db->prepare("SELECT vencimiento_token FROM usuario WHERE usuario = :usuario");
@@ -119,6 +120,19 @@ class Usuario{
         return false;    
     }
 
+    public static function obtenerUsuarioPorToken($token): array|false{
+        $db=(new Conexion())->getDb();
+        $query="SELECT * FROM usuario WHERE token= :token AND vencimiento_token > NOW()";
+        $stmt=$db->prepare($query);
+        $token = trim($token);
+        $stmt->bindParam(':token', $token);
+        $stmt->execute();
+        $result=$stmt->fetch(PDO::FETCH_ASSOC);
+        if(!$result){
+            return false;
+        }
+        return $result;
+    }
 
     public function actualizarCredenciales(string $usuario,string $nombre,string $clave):bool{
         $db = (new Conexion())->getDb();
@@ -138,7 +152,7 @@ class Usuario{
     }
 
 
-
+    
     public function info(string $usuario):array{
         $db = (new Conexion())->getDb();
         $query="SELECT * FROM usuario WHERE usuario = :usuario";

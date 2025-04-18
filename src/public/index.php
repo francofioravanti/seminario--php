@@ -15,6 +15,8 @@ $app->addBodyParsingMiddleware();
 
 
 (require __DIR__ . '/../routes/usuario.php')($app);
+(require __DIR__ . '/../routes/partida.php')($app);
+(require __DIR__ . '/../routes/mazo.php')($app);
 
 
 
