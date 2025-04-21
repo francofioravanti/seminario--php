@@ -27,7 +27,7 @@ $app->post('/jugadas', function (Request $request, Response $response) {
         return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
     }
 
-    // //aca llamamos al metodo cartaValidaParaPartida y validamos que la carta esté en su mazo
+    
     $partida = new Partida();
     $resultado = $partida->procesarJugada($usuario['id'], $cartaId, $partidaId);
 
