@@ -277,4 +277,14 @@ class Partida{
     ];
     }
 }
+//GET
+    public function obtenerCartasEnMano($usuarioId, $partidaId): array  {
+        $db= (new Conexion())->getDb();
+        $mazoId= $this->obtenerMazoId($db,$partidaId);
+        $stmt = $db->prepare("SELECT c.nombre,c.ataque,c.ataque_nombre,a.nombre AS atributo FROM mazo_carta mc JOIN carta c ON mc.carta_id = c.id
+        JOIN atributo a ON c.atributo_id = a.id WHERE mc.mazo_id = :mazo_id AND mc.estado = 'en_mano'"); //pido los datos
+    $stmt->bindParam(':mazo_id',$mazoId);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO :: FETCH_ASSOC);
+}
 ?>
