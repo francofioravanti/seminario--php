@@ -36,10 +36,12 @@ $app->post('/jugadas', function (Request $request, Response $response) {
         return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
     }
 
-    $response->getBody()->write(json_encode([ 'mensaje' => 'Se registro la jugada correctamente', 'carta_servidor' => $resultado['carta_servidor', 'ataque_jugador' => $resultado['ataque_jugador'],
-    'ataque_servidor' => $resultado['ataque_servidor'],
-    'ganador_final' => $resultado['ganador_final'] ?? null
-]));
+       $response->getBody()->write(json_encode([ 'mensaje' => 'Se registro la jugada correctamente', 'carta_servidor' => $resultado['carta_servidor', 'ataque_jugador' => $resultado['ataque_jugador'],
+        'carta_servidor' => $resultado['carta_servidor'],
+        'ataque_jugador' => $resultado['ataque_jugador'],
+        'ataque_servidor' => $resultado['ataque_servidor'],
+        'ganador_final' => isset($resultado['ganador_final']) ? $resultado['ganador_final'] : null
+    ]));
     return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
 });
 
