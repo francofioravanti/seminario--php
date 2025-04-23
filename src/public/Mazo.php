@@ -81,7 +81,34 @@ class Mazo{
 
     }
 
-    
+  public function eliminarMazo($mazoId): array {
+    $db = (new Conexion())->getDb();
+    $query = "SELECT COUNT(*) as total FROM partida WHERE mazo_id = :mazo_id";
+     $stmt = $db->prepare($query);
+    $stmt-> bindParam(':mazo_id', $mazoId);
+    $stmt->execute();
+    $result=$stmt->fetch(PDO:: FETCH_ASSOC);
+    if($result ['total']>0){
+        throw new Exception("El mazo no puede ser eliminado. Participó en una partida.");
+    }
+    // Eliminar el mazo
+    $stmt = $db->prepare("DELETE FROM mazo WHERE id = :mazo_id");
+    $stmt->bindParam(':mazo_id',$mazoId);
+    $stmt->execute();
+    if ($stmt->rowCount() > 0) {//Devuelve la cantidad de filas afectadas por la sentencia SQL 
+        return ['mensaje' => 'Mazo eliminado correctamente'];
+    } else {
+        throw new Exception("No se eliminó ningún mazo ");
+    }
+    }
+    public function actualizarNombre($mazo_id,$nuevoNombre): bool {
+            $db=(new Conexion())->getDb();
+            $stmt=$db->prepare("UPDATE mazo SET nombre =:nombre WHERE id= :mazo_id");
+            $stmt->bindParam(':nombre',$nuevoNombre);
+            $stmt->bindParam(':mazo_id',$mazo_id);
+            return $stmt->execute();    
+    }
+
 }
 
 
