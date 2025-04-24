@@ -89,7 +89,7 @@ class Mazo{
     $stmt->execute();
     $result=$stmt->fetch(PDO:: FETCH_ASSOC);
     if($result ['total']>0){
-        throw new Exception("El mazo no puede ser eliminado. Participó en una partida.");
+        throw new Exception("El mazo no puede ser eliminado debido a que participó en una partida.");
     }
     // Eliminar el mazo
     $stmt = $db->prepare("DELETE FROM mazo WHERE id = :mazo_id");
@@ -98,7 +98,7 @@ class Mazo{
     if ($stmt->rowCount() > 0) {//Devuelve la cantidad de filas afectadas por la sentencia SQL 
         return ['mensaje' => 'Mazo eliminado correctamente'];
     } else {
-        throw new Exception("No se eliminó ningún mazo ");
+        throw new Exception("No hay mazos para eliminar con ese ID. ");
     }
     }
     public function actualizarNombre($mazo_id,$nuevoNombre): bool {
@@ -107,6 +107,46 @@ class Mazo{
             $stmt->bindParam(':nombre',$nuevoNombre);
             $stmt->bindParam(':mazo_id',$mazo_id);
             return $stmt->execute();    
+    }
+
+
+
+    public static function obtenerMazoConCartarDeUsuario($usuarioId):array{
+        $db = (new Conexion())->getDb();
+
+        //BUSCO TODOS LOS MAZOS DEL SUUARIO LOGEUADO
+        $stmt = $db->prepare("SELECT id, nombre FROM mazo WHERE usuario_id = :usuarioId");
+        $stmt->bindParam(':usuarioId', $usuarioId, PDO::PARAM_INT);
+        $stmt->execute();
+        $datosMazos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $mazos = [];
+
+        foreach ($datosMazos as $mazo) {
+            // BUSCO TODOS LOS IDS DE LAS CARTAS DEL MAZO
+            $stmtCartas = $db->prepare("SELECT carta_id FROM mazo_carta WHERE mazo_id = :mazoId");
+            $stmtCartas->bindParam(':mazoId', $mazo['id'], PDO::PARAM_INT);
+            $stmtCartas->execute();
+            $cartasIds = $stmtCartas->fetchAll(PDO::FETCH_COLUMN);
+
+           //BUSCO LOS NOMBRES DE LAS CARTAS CON ESOS IDS 
+            $nombresCartas = [];
+            foreach ($cartasIds as $cartaId) {
+                $stmtNombre = $db->prepare("SELECT nombre FROM carta WHERE id = :id");
+                $stmtNombre->bindParam(':id', $cartaId, PDO::PARAM_INT);
+                $stmtNombre->execute();
+                $nombre = $stmtNombre->fetchColumn();
+                if ($nombre) {
+                    $nombresCartas[] = $nombre;
+                }
+            }   
+            $mazos[] = [
+                'nombre_mazo' => $mazo['nombre'],
+                'cartas' => $nombresCartas
+            ];
+        
+        }
+        return $mazos;
     }
 
 }
