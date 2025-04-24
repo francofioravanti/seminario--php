@@ -149,6 +149,31 @@ class Mazo{
         return $mazos;
     }
 
+    //lo que hace "AS" es generar una columna con el string q pongas desp
+    public static function buscarCartas(? string $nombre ,? string $atributo):array{
+        $db = (new Conexion())->getDb();
+        $query="SELECT carta.nombre, carta.ataque, carta.ataque_nombre, atributo.nombre AS atributo
+                FROM carta,atributo
+                WHERE carta.atributo_id = atributo.id";
+
+        //FILTRO LAS CARTAS POR NOMBRE O ATRIBUTO
+        if ($atributo !== null && $atributo !== '') {
+            $query .= " AND atributo.nombre LIKE '%$atributo%'";
+        }
+    
+        if ($nombre !== null && $nombre !== '') {
+            $query .= " AND carta.nombre LIKE '%$nombre%'";
+        }
+
+        $stmt = $db->prepare($query);
+        $stmt->execute();
+    
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    }
+
+
+
 }
 
 

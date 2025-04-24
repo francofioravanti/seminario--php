@@ -156,9 +156,27 @@ return function (App $app) {
         }
     });
 
+
+    $app->get('/cartas',function(Request $request,Response $response){
+        //OBTENGO EL ATRIBUTO Y NOMBRE DE LA CARTA RECIBIDO POR LA URL
+        $queryParams = $request->getQueryParams();
+        $atributo = $queryParams['atributo'] ?? null;
+        $nombre = $queryParams['nombre'] ?? null;
+
+        $cartas= Mazo::buscarCartas($nombre,$atributo);
+
+        $response->getBody()->write(json_encode($cartas));
+        return $response
+        ->withHeader('Content-Type', 'application/json')
+        ->withStatus(200);
+
+
+    });
+
+
+
  };
-//Si el mazo ha participado de una partida, no puede borrarse y debe devolver la excepción correspondiente. Validar que el usuario esté logueado. 
-//si llevamos le pertenece el mazo habria que modificar los endpoint y metodos delete y put y eliminar mazo 
+
 ?>
 
 
