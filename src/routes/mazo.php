@@ -5,6 +5,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 require_once __DIR__ . '/../public/Usuario.php';
 require_once __DIR__ . '/../public/Mazo.php';
+require_once __DIR__ . '/../public/Partida.php';
 
 return function (App $app) {
 
@@ -49,9 +50,8 @@ return function (App $app) {
 
     });
 
-    $app->DELETE ('/mazos/{mazo}', function(Request $request,Response $response, array $args){ 
+    $app->delete('/mazos/{mazo}', function(Request $request,Response $response, array $args){ 
         $mazoId = (int)$args['mazo'];
-    
         $token = $request->getHeaderLine('Authorization');
         $token = str_replace('Bearer ', '', $token);
     try {
@@ -62,7 +62,7 @@ return function (App $app) {
         if(!$usuarioLogueado){
             throw new Exception("Token inválido o expirado");
         }
-        $partida = new Partida();
+        $partida = new Partida(); // consultar si se puede instanciar este tipo de clases en los endpoints.
         if (!$partida->verificarPertenenciaMazo($usuarioLogueado['id'], $mazoId)) {
             throw new Exception("El mazo no te pertenece");
         }
@@ -77,12 +77,51 @@ return function (App $app) {
     }
     }); 
 
-    $app->PUT ('/mazos/{mazo}', function (Request $request,Response $response,$args){
-    $mazoId = (int)$args['mazo'];
+
+    $app->get('/usuarios/{usuario}/mazos',function(Request $request , Response $response , $args){
+        $usuarioId = (int)$args['usuario'];
+
+        //VERIFICO QUE ESTE LOGEUADO
+        $token = $request->getHeaderLine('Authorization');
+        $token = str_replace('Bearer ', '', $token);
+        $usuario = Usuario::obtenerUsuarioPorToken($token);
+        if (!$usuario) {
+            $response->getBody()->write(json_encode([
+                'error' => 'Usuario no logueado o token inválido'
+            ]));
+            
+            return $response
+                ->withStatus(401)
+                ->withHeader('Content-Type', 'application/json');
+            
+        }
+
+        //VERIFICO Q SEA LE MISMO Y Q NO SEA EL SERVIDOR
+        if ($usuarioId !== (int)$usuario['id'] && $usuario['id'] != 1) {
+            $response->getBody()->write(json_encode([
+                'error' => 'No tienes permisos para acceder a los mazos de este usuario.'
+            ]));
+            return $response
+                ->withStatus(403) 
+                ->withHeader('Content-Type', 'application/json');
+        }
+
+
+        $mazos = Mazo::obtenerMazoConCartarDeUsuario($usuarioId);
+    
+        $response->getBody()->write(json_encode($mazos));
+        return $response->withHeader('Content-Type', 'application/json');
+
+    });
+
+
+
+    $app->put('/mazos/{mazo}', function (Request $request,Response $response,$args){
+        $mazoId = (int)$args['mazo'];
     
         $token = $request->getHeaderLine('Authorization');
         $token = str_replace('Bearer ', '', $token);
-    try {
+        try {
         if (!$token) {
             throw new Exception("Token no enviado");
         }
@@ -96,6 +135,7 @@ return function (App $app) {
         if (!$partida->verificarPertenenciaMazo( $usuarioId, $mazoId)) {
             throw new Exception("El mazo no te pertenece");
         }
+
         // Obtener nuevo nombre del cuerpo del request
         
         $data = $request->getParsedBody();
@@ -109,22 +149,17 @@ return function (App $app) {
         }
         $response->getBody()->write(json_encode(['mensaje'=>'Mazo actualizado correctamente']));
         return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
-    }
-    catch (Exception $e) {
-        $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
-        return $response->withStatus(403)->withHeader('Content-Type', 'application/json');
-    }
+        }
+        catch (Exception $e) {
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            return $response->withStatus(403)->withHeader('Content-Type', 'application/json');
+        }
     });
 
  };
 //Si el mazo ha participado de una partida, no puede borrarse y debe devolver la excepción correspondiente. Validar que el usuario esté logueado. 
 //si llevamos le pertenece el mazo habria que modificar los endpoint y metodos delete y put y eliminar mazo 
-
 ?>
 
 
 
-}
-
-
-?>
