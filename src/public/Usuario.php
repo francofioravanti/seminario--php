@@ -120,18 +120,15 @@ class Usuario{
         return false;    
     }
 
-    public static function obtenerUsuarioPorToken($token): array|false{
+    public static function obtenerUsuarioPorToken($token): array{
         $db=(new Conexion())->getDb();
         $query="SELECT * FROM usuario WHERE token= :token AND vencimiento_token > NOW()";
         $stmt=$db->prepare($query);
         $token = trim($token);
         $stmt->bindParam(':token', $token);
         $stmt->execute();
-        $result=$stmt->fetch(PDO::FETCH_ASSOC);
-        if(!$result){
-            return false;
-        }
-        return $result;
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+        
     }
 
     public function actualizarCredenciales(string $usuario,string $nombre,string $clave):bool{

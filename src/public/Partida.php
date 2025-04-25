@@ -109,8 +109,11 @@ class Partida{
 
     public function puedeJugar($token,$mazoid):array|bool{
         //selecciono todo del usuario que tenga ese token y este vigente.
-        $result=Usuario::obtenerUsuarioPorToken($token); // esta bien esto? se puede usar en endpoints tmb?
+        $result=Usuario::obtenerUsuarioPorToken($token); 
+        
+        
         if (!is_array($result)) {
+            
             return false;
         }
         
@@ -134,6 +137,8 @@ class Partida{
                 $partida_id = $db->lastInsertId();
                 $estado = 'en_mano';
                 $this->actualizarTodasLasCartas($db,$mazoid,$estado);
+                //Se actualizan todas las cartas del servidor a "en_mano"
+                $this->actualizarTodasLasCartas($db,1,'en_mano');
                 return ['partida_id' => $partida_id];
             }
 
@@ -266,18 +271,19 @@ class Partida{
         } catch (Exception $e) {
             return ['error' => 'No hay cartas disponibles para el servidor'];
         }
-    
-        // Obtener atributos de las cartas
+
+        
+        
         $jugador = $this->getDatosCartas($db, $cartaId);
         $servidor = $this->getDatosCartas($db, $cartaServidorId);
     
-        // Calcular bonus
+        
         [$bonusJugador, $bonusServidor] = $this->calcularBonus($db, $jugador['atributo_id'], $servidor['atributo_id']);
     
         $ataqueJugador = $jugador['ataque'] * $bonusJugador;
         $ataqueServidor = $servidor['ataque'] * $bonusServidor;
     
-        // Determinar resultado
+        
         if ($ataqueJugador > $ataqueServidor) {
             $resultado = 'ganó';
         } elseif ($ataqueJugador < $ataqueServidor) {
@@ -287,10 +293,10 @@ class Partida{
         }
         
     
-        // Guardar jugada
+        
         $this->guardarJugada($db, $partidaId, $cartaId, $cartaServidorId, $resultado);
     
-        // Verificar si se debe cerrar la partida
+        
         $ganadorFinal = $this->cerrarPartidaSiCorresponde($db, $partidaId);
     
         return [
