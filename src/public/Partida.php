@@ -277,7 +277,7 @@ class Partida{
         $jugador = $this->getDatosCartas($db, $cartaId);
         $servidor = $this->getDatosCartas($db, $cartaServidorId);
     
-        
+        //QUE HACE ESTA LINEA?
         [$bonusJugador, $bonusServidor] = $this->calcularBonus($db, $jugador['atributo_id'], $servidor['atributo_id']);
     
         $ataqueJugador = $jugador['ataque'] * $bonusJugador;

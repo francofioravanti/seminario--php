@@ -61,19 +61,23 @@ return function (App $app) {
     });
 
 
-
+    
     $app->put('/usuarios/{usuario}',function(Request $request , Response $response ){
         $data= $request->getParsedBody();
 
+        //deberia recibir el token 
+        $token = str_replace('Bearer ', '', $request->getHeaderLine('Authorization'));
+
         $servicio=new Usuario();
         
+        $usuarioLogueado= $servicio::obtenerUsuarioPorToken($token);
         
         $usuario=$data['usuario'];
         $nombre=$data['nombre']; 
         $clave=$data['clave'];
 
         //verifico si esta logueado.
-        if (!$servicio->estaLogueado($usuario)){
+        if (!$usuarioLogueado){
             $response->getBody()->write(json_encode(['error' => 'No esta logueado']));
         return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
         }
@@ -109,15 +113,22 @@ return function (App $app) {
 
     });
 
+
+
+
+    //CAMBIAR EL ESTALOGEUADO DEL IF 
     $app->get('/usuarios/{usuario}',function (Request $request , Response $response){
         $data=$request->getParsedBody();
 
         $usuario=$data['usuario'];
+        //deberia recibir el token 
+        $token = str_replace('Bearer ', '', $request->getHeaderLine('Authorization'));
 
         $servicio=new Usuario();
 
+        $usuarioLogueado= $servicio::obtenerUsuarioPorToken($token);
         //verifico que este logueado
-        if (!$servicio->estaLogueado($usuario)){
+        if (!$usuarioLogueado){
             $response->getBody()->write(json_encode(['error' => 'No esta logueado']));
             return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
         }

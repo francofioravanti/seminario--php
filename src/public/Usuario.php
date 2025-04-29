@@ -51,7 +51,7 @@ class Usuario{
         $stmt->bindParam(':clave', $clave); #$hash porq es la clave ya encriptada
         
 
-          // 💥 LOG: intentamos insertar
+        
         error_log("🟡 Intentando insertar usuario: $usuario");
 
         if ($stmt->execute()) {
@@ -106,19 +106,7 @@ class Usuario{
     }
     
     //esta mal tener dos metodos que hacen lo mismo pero de diferente manera? uno por usuario  y otro por token.
-    public function estaLogueado(string $usuario):bool{
-        $db = (new Conexion())->getDb();
-        $stmt = $db->prepare("SELECT vencimiento_token FROM usuario WHERE usuario = :usuario");
-        $stmt->bindParam(':usuario',$usuario);
-        $stmt->execute();
-        $result=$stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($result && $result['vencimiento_token'] > date("Y-m-d H:i:s")) {
-            return true;
-        }
-        
-        return false;    
-    }
+   
 
     public static function obtenerUsuarioPorToken($token): array{
         $db=(new Conexion())->getDb();
