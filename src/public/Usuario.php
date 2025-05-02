@@ -52,14 +52,14 @@ class Usuario{
         
 
         
-        error_log("🟡 Intentando insertar usuario: $usuario");
+        error_log(" Intentando insertar usuario: $usuario");
 
         if ($stmt->execute()) {
-            error_log("✅ Usuario insertado correctamente.");
+            error_log(" Usuario insertado correctamente.");
             return [];
         } else {
             $error = $stmt->errorInfo();
-            error_log("❌ Error al insertar: " . print_r($error, true));
+            error_log(" Error al insertar: " . print_r($error, true));
             $errores[] = "Error al registrar usuario.";
             return $errores;
         }
