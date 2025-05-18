@@ -14,44 +14,44 @@ return function (App $app) {
    
 $app->post('/login', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
+    $usuario = $data['usuario'] ?? null;
+    $clave = $data['password'] ?? null;
 
-    $errores = [];
+    // Validación de campos faltantes
+    if (!$usuario || !$clave) {
+        $errores = [];
+        if (!$usuario) $errores[] = 'Falta el campo usuario';
+        if (!$clave) $errores[] = 'Falta el campo password';
 
-    if (empty($data['usuario'])) {
-        $errores[] = 'Falta el campo usuario.';
-    }
-
-    if (empty($data['password'])) {
-        $errores[] = 'Falta el campo password.';
-    }
-
-    if (!empty($errores)) {
-        $response->getBody()->write(json_encode(['errores' => $errores]));
+        $response->getBody()->write(json_encode(['error' => $errores]));
         return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
     }
 
-    $usuario = $data['usuario'];
-    $clave = $data['password'];
-
     $servicio = new Usuario();
-    $esValido = $servicio->validarUsuario($usuario, $clave);
+    $usuarioData = $servicio->validarUsuario($usuario, $clave);
 
-    if (!$esValido) {
+    if (!$usuarioData) {
         $response->getBody()->write(json_encode(['error' => 'Credenciales inválidas']));
         return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
     }
 
-    $usuarioData = $servicio->info($usuario);
+    // Obtenemos el ID del usuario desde los datos validados
     $usuarioId = $usuarioData['id'];
 
-    $expire = (new \DateTime("now"))->modify("+1 hour")->format("Y-m-d H:i:s");
+    // Generar vencimiento y token JWT
+    $expire = (new DateTime("now"))->modify("+1 hour")->format("Y-m-d H:i:s");
+
     $token = JWT::encode([
         "usuario" => $usuarioId,
         "expired_at" => $expire
-                ],IsLoggedMiddleware::$secret, 'HS256');
+    ], \App\Application\Middleware\IsLoggedMiddleware::$secret, 'HS256');
 
-    $response = $response->withHeader('token', $token);
-    $response->getBody()->write(json_encode(['mensaje' => 'Login correcto', 'token' => $token]));
+    // Respuesta final
+    $response->getBody()->write(json_encode([
+        'mensaje' => 'Login correcto',
+        'token' => $token
+    ]));
+
     return $response->withHeader("Content-Type", "application/json");
 });
 
