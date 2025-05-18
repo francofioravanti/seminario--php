@@ -1,33 +1,9 @@
 <?php
 class Usuario{
 
-    public function validarUsuario($usuario,$clave):bool{
-        $db=(new Conexion())->getDb(); 
-        $query="SELECT * FROM usuario WHERE usuario = :usuario";
-        $stmt=$db->prepare($query);
-        $stmt->bindParam(':usuario',$usuario);
-        $stmt->execute();
-        $result=$stmt->fetch(PDO::FETCH_ASSOC);
-        
+    
 
-        if ($result && $clave === $result['password']) {
-            return true;
-        }
-        return false;
-    }
-
-    public function guardarToken($usuario,$token):bool{
-        $db=(new Conexion())->getDb(); 
-
-        $vencimiento = date('Y-m-d H:i:s', strtotime('+1 hour')); // vence en 1 hora
-
-        $query="UPDATE usuario  SET token = :token , vencimiento_token =  :vencimiento WHERE usuario = :usuario ";
-        $stmt=$db->prepare($query);
-        $stmt->bindParam(':token',$token);
-        $stmt->bindParam(':usuario',$usuario);
-        $stmt->bindParam(':vencimiento',$vencimiento);
-        return $stmt->execute();
-    }
+    
 
 
     public function registrarUsuario(string $nombre,string $usuario, string $clave): array {
@@ -51,15 +27,14 @@ class Usuario{
         $stmt->bindParam(':clave', $clave); #$hash porq es la clave ya encriptada
         
 
-        
-        error_log("🟡 Intentando insertar usuario: $usuario");
+    
 
         if ($stmt->execute()) {
-            error_log("✅ Usuario insertado correctamente.");
+            
             return [];
         } else {
             $error = $stmt->errorInfo();
-            error_log("❌ Error al insertar: " . print_r($error, true));
+            
             $errores[] = "Error al registrar usuario.";
             return $errores;
         }
@@ -86,7 +61,20 @@ class Usuario{
 
         return true;
     }
+    public function validarUsuario($usuario,$clave):bool{
+        $db=(new Conexion())->getDb(); 
+        $query="SELECT * FROM usuario WHERE usuario = :usuario";
+        $stmt=$db->prepare($query);
+        $stmt->bindParam(':usuario',$usuario);
+        $stmt->execute();
+        $result=$stmt->fetch(PDO::FETCH_ASSOC);
+        
 
+        if ($result && $clave === $result['password']) {
+            return true;
+        }
+        return false;
+    }
     public function validarClave(string $clave, array &$errores): bool {
         $reglas = [
             'La clave debe tener al menos 8 caracteres.' => strlen($clave) < 8,
@@ -105,47 +93,27 @@ class Usuario{
         return count($errores) === 0;
     }
     
-    //esta mal tener dos metodos que hacen lo mismo pero de diferente manera? uno por usuario  y otro por token.
-   
 
-    public static function obtenerUsuarioPorToken($token): array{
-        $db=(new Conexion())->getDb();
-        $query="SELECT * FROM usuario WHERE token= :token AND vencimiento_token > NOW()";
-        $stmt=$db->prepare($query);
-        $token = trim($token);
-        $stmt->bindParam(':token', $token);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-        
-    }
-
-    public function actualizarCredenciales(string $usuario,string $nombre,string $clave):bool{
+    public function actualizarCredencialesPorId(int $id, string $nombre, string $clave): bool {
         $db = (new Conexion())->getDb();
-        $query = ("UPDATE usuario SET nombre = :nombre , password= :password WHERE usuario = :usuario");
-        $stmt=$db->prepare($query);
-        $stmt->bindParam(':nombre',$nombre);
-        $stmt->bindParam(':usuario',$usuario);
-        $stmt->bindParam(':password',$clave);
-        
-        if ($stmt->execute()){
-            return true;
-        }else {
-            return false;
-        }
+        $query = "UPDATE usuario SET nombre = :nombre, password = :password WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':nombre', $nombre);
+        $stmt->bindParam(':password', $clave);
+        $stmt->bindParam(':id', $id);
 
-
+        return $stmt->execute();
     }
 
 
     
-    public function info(string $usuario):array{
-        $db = (new Conexion())->getDb();
-        $query="SELECT * FROM usuario WHERE usuario = :usuario";
-        $stmt=$db->prepare($query);
-        $stmt->bindParam(':usuario',$usuario);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-
-    }
+    public function info($id): array {
+    $db = (new Conexion())->getDb();
+    $stmt = $db->prepare("SELECT * FROM usuario WHERE id = :id");
+    $stmt->bindParam(':id', $id);
+    $stmt->execute();
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $data ?: []; // si no hay nada, devuelve array vacío
+}
 
 }

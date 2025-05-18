@@ -158,7 +158,7 @@ return function (App $app) {
 
 
     $app->get('/cartas',function(Request $request,Response $response){
-        //OBTENGO EL ATRIBUTO Y NOMBRE DE LA CARTA RECIBIDO POR LA URL
+        //OBTENGO EL ATRIBUTO Y/O NOMBRE DE LA CARTA RECIBIDO POR LA URL
         $queryParams = $request->getQueryParams();
         $atributo = $queryParams['atributo'] ?? null;
         $nombre = $queryParams['nombre'] ?? null;
@@ -169,8 +169,6 @@ return function (App $app) {
         return $response
         ->withHeader('Content-Type', 'application/json')
         ->withStatus(200);
-
-
     });
 
 
