@@ -61,20 +61,21 @@ class Usuario{
 
         return true;
     }
-    public function validarUsuario($usuario,$clave):bool{
-        $db=(new Conexion())->getDb(); 
-        $query="SELECT * FROM usuario WHERE usuario = :usuario";
-        $stmt=$db->prepare($query);
-        $stmt->bindParam(':usuario',$usuario);
-        $stmt->execute();
-        $result=$stmt->fetch(PDO::FETCH_ASSOC);
-        
+    public function validarUsuario($usuario, $clave): array|false {
+    $db = (new Conexion())->getDb();
+    $query = "SELECT * FROM usuario WHERE usuario = :usuario";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':usuario', $usuario);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($result && $clave === $result['password']) {
-            return true;
-        }
-        return false;
+    if ($result && $clave === $result['password']) {
+        return $result; 
     }
+
+    return false;
+}
+
     public function validarClave(string $clave, array &$errores): bool {
         $reglas = [
             'La clave debe tener al menos 8 caracteres.' => strlen($clave) < 8,
