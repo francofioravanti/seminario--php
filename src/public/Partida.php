@@ -107,60 +107,55 @@ class Partida{
 
 
 
-    public function puedeJugar($token,$mazoid):array|bool{
-        //selecciono todo del usuario que tenga ese token y este vigente.
-        $result=Usuario::obtenerUsuarioPorToken($token); 
-        
-        
-        if (!is_array($result)) {
-            
-            return false;
-        }
-        
-        $db = (new Conexion())->getDb();
-        $id=$result['id'];
-        $usuario=$result['usuario'];
+    public function puedeJugar(int $usuarioId, int $mazoid): array|bool {
+    $db = (new Conexion())->getDb();
 
+    $stmt = $db->prepare("SELECT usuario FROM usuario WHERE id = :id");
+    $stmt->bindParam(':id', $usuarioId, PDO::PARAM_INT);
+    $stmt->execute();
+    $usuarioNombre = $stmt->fetchColumn();
 
-
-        if ($this->lePerteneceElMazo($db,$id,$mazoid)){
-            $query="INSERT INTO partida (usuario_id, el_usuario, fecha, mazo_id, estado)
-                    VALUES (:usuario_id, :el_usuario, NOW(), :mazo_id, :estado)";
-            $stmt=$db->prepare($query);
-            $stmt->bindParam(':usuario_id',$id);
-            $stmt->bindParam(':el_usuario',$usuario);
-            $stmt->bindParam(':mazo_id',$mazoid);
-            $estado = 'en_curso';
-            $stmt->bindParam(':estado',$estado);
-
-            if($stmt->execute()) {
-                $partida_id = $db->lastInsertId();
-                $estado = 'en_mano';
-                $this->actualizarTodasLasCartas($db,$mazoid,$estado);
-                //Se actualizan todas las cartas del servidor a "en_mano"
-                $this->actualizarTodasLasCartas($db,1,'en_mano');
-                return ['partida_id' => $partida_id];
-            }
-
-        }
+    if (!$usuarioNombre) {
         return false;
     }
+
+    if ($this->lePerteneceElMazo($db, $usuarioId, $mazoid)) {
+        $query = "INSERT INTO partida (usuario_id, el_usuario, fecha, mazo_id, estado)
+                  VALUES (:usuario_id, :el_usuario, NOW(), :mazo_id, :estado)";
+        $stmt = $db->prepare($query);
+        $estado = 'en_curso';
+        $stmt->bindParam(':usuario_id', $usuarioId);
+        $stmt->bindParam(':el_usuario', $usuarioNombre);
+        $stmt->bindParam(':mazo_id', $mazoid);
+        $stmt->bindParam(':estado', $estado);
+
+        if ($stmt->execute()) {
+            $partida_id = $db->lastInsertId();
+            $this->actualizarTodasLasCartas($db, $mazoid, 'en_mano');
+            $this->actualizarTodasLasCartas($db, 1, 'en_mano'); 
+
+            return ['partida_id' => $partida_id];
+        }
+    }
+
+    return false;
+}
     
-    public function verificarPertenenciaMazo($usuarioId, $mazoId): bool {// esto lo uso para delete mazo (solo creo esta funcion para poder reutilizar le perteneceElMazo sin hacer esa funcion publica. aunque podria simplemente hace rpublica la otra funcion, capaz es mejor)
+    public function verificarPertenenciaMazo($usuarioId, $mazoId): bool {
         $db = (new Conexion())->getDb();
         return $this->lePerteneceElMazo($db, $usuarioId, $mazoId);
     }
 
-///////////////////////////////
+
     private function obtenerMazoId($db, $partidaId, $esServidor = false) {
      if ($esServidor) {
-        // Devuelve el mazo del usuario_id = 1 (servidor)
+        
         $stmt = $db->prepare("SELECT id FROM mazo WHERE usuario_id = 1 LIMIT 1");
         $stmt->execute();
         return $stmt->fetchColumn();
     }
 
-    // Devuelve el mazo del jugador a partir de la partida
+    
     $stmt = $db->prepare("SELECT mazo_id FROM partida WHERE id = :id");
     $stmt->bindParam(':id', $partidaId);
     $stmt->execute();
@@ -168,19 +163,19 @@ class Partida{
     }
 
 
-    public function cartaValidaParaPartida($usuarioId, $partidaId,  $cartaId): bool { //validamos la carta
+    public function cartaValidaParaPartida($usuarioId, $partidaId,  $cartaId): bool { 
         $db = (new Conexion())->getDb();
-        $stmt = $db->prepare ("SELECT  mazo_id FROM partida WHERE id = :partida_id AND usuario_id = :usuario_id AND  estado = 'en_curso'"); //  Obtenemos el mazo de esa partida
+        $stmt = $db->prepare ("SELECT  mazo_id FROM partida WHERE id = :partida_id AND usuario_id = :usuario_id AND  estado = 'en_curso'"); 
         $stmt -> bindParam(':partida_id',$partidaId);
         $stmt -> bindParam(':usuario_id',$usuarioId);
         $stmt->execute();
-        $mazo = $stmt->fetch(PDO::FETCH_ASSOC); //devuelve lo que se consulto
+        $mazo = $stmt->fetch(PDO::FETCH_ASSOC); 
         if  (!$mazo) {
             return false;
         }
         $mazoId = $mazo['mazo_id'];
 
-        // 2. Verificar que la carta esté en ese mazo y en estado 'en_mano'
+     
         if (!$this->lePerteneceElMazo($db, $usuarioId, $mazoId)) return false;
         $stmt = $db->prepare("SELECT * FROM mazo_carta WHERE mazo_id = :mazo_id AND carta_id = :carta_id AND estado = 'en_mano'");
         $stmt->bindParam(':mazo_id', $mazoId);
@@ -193,20 +188,20 @@ class Partida{
 
     
 
-     // se calcula si es la 5ta mano
+     
     private function cerrarPartidaSiCorresponde($db, $partidaId){
-        $stmt = $db->prepare("SELECT COUNT(*) as jugadas FROM jugada WHERE partida_id = :id"); // select count cuenta cuántas jugadas hubo en la partida de ese id
+        $stmt = $db->prepare("SELECT COUNT(*) as jugadas FROM jugada WHERE partida_id = :id"); 
         $stmt->execute([':id' => $partidaId]);
         $ronda = $stmt->fetch(PDO::FETCH_ASSOC)['jugadas'];
 
-        if ((int)$ronda < 5) return null; // mientras no sea 5 no se procesa este codigo, no se cierra la partida
+        if ((int)$ronda < 5) return null; 
 
         $stmt = $db->prepare("SELECT el_usuario, COUNT(*) as total FROM jugada WHERE partida_id = :id GROUP BY el_usuario");// 
         $stmt->execute([':id' => $partidaId]);
         $conteo = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $gano =  $perdio = 0;
-        foreach ($conteo as $fila) { // cuenta total de ganadas y perdidas
+        foreach ($conteo as $fila) { 
             if ($fila['el_usuario'] === 'gano') 
                 $gano = $fila['total'];
             if ($fila['el_usuario'] === 'perdio') 
@@ -239,7 +234,7 @@ class Partida{
     private function calcularBonus($db,int $atributoJugador,int $atributoServidor):array{
         $bonus = 1.3;
         $jugadorBonus = $servidorBonus = 1;// inicializa bonus
-        $stmt = $db->prepare("SELECT * FROM gana_a WHERE atributo_id = :a1 AND atributo_id2 = :a2");//  consulta a la tabla gana_a, que es donde tenés definidas las relaciones de ventaja de atributos
+        $stmt = $db->prepare("SELECT * FROM gana_a WHERE atributo_id = :a1 AND atributo_id2 = :a2");
         $stmt->execute([':a1' => $atributoJugador, ':a2' => $atributoServidor]);
         if ($stmt->fetch()) $jugadorBonus = $bonus;
         $stmt->execute([':a1' => $atributoServidor, ':a2' => $atributoJugador]);
@@ -254,7 +249,7 @@ class Partida{
         $stmt->bindParam(':carta_id_b', $cartaServidor);
         $stmt->bindParam(':resultado', $resultado); 
         $stmt->execute();
-        // actualizamos el estado de las cartas a descartado
+     
         $this->actualizarEstadoCarta($cartaJugador,$this->obtenerMazoId($db, $partidaId),'descartado');
         $this->actualizarEstadoCarta($cartaServidor,    1   ,'descartado');
     }
@@ -277,7 +272,6 @@ class Partida{
         $jugador = $this->getDatosCartas($db, $cartaId);
         $servidor = $this->getDatosCartas($db, $cartaServidorId);
     
-        //QUE HACE ESTA LINEA?
         [$bonusJugador, $bonusServidor] = $this->calcularBonus($db, $jugador['atributo_id'], $servidor['atributo_id']);
     
         $ataqueJugador = $jugador['ataque'] * $bonusJugador;
@@ -306,7 +300,7 @@ class Partida{
             'resultado_final' => $ganadorFinal
         ];
     }
-//GET
+
     public function obtenerCartasEnMano($usuarioId, $partidaId): array  {
         $db= (new Conexion())->getDb();
         $mazoId= $this->obtenerMazoId($db,$partidaId);

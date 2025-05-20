@@ -17,7 +17,7 @@ $app->post('/login', function (Request $request, Response $response) {
     $usuario = $data['usuario'] ?? null;
     $clave = $data['password'] ?? null;
 
-    // Validación de campos faltantes
+   
     if (!$usuario || !$clave) {
         $errores = [];
         if (!$usuario) $errores[] = 'Falta el campo usuario';
@@ -35,10 +35,10 @@ $app->post('/login', function (Request $request, Response $response) {
         return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
     }
 
-    // Obtenemos el ID del usuario desde los datos validados
+    
     $usuarioId = $usuarioData['id'];
 
-    // Generar vencimiento y token JWT
+   
     $expire = (new DateTime("now"))->modify("+1 hour")->format("Y-m-d H:i:s");
 
     $token = JWT::encode([
@@ -46,7 +46,7 @@ $app->post('/login', function (Request $request, Response $response) {
         "expired_at" => $expire
     ], \App\Application\Middleware\IsLoggedMiddleware::$secret, 'HS256');
 
-    // Respuesta final
+    
     $response->getBody()->write(json_encode([
         'mensaje' => 'Login correcto',
         'token' => $token
@@ -56,8 +56,6 @@ $app->post('/login', function (Request $request, Response $response) {
 });
 
 
-
-#Define una ruta POST en la URL /registro.   Cuando se haga un POST ahí, se ejecuta esta función anónima que recibe:
     $app->post('/registro', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
 
