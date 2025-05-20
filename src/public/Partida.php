@@ -110,35 +110,48 @@ class Partida{
     public function puedeJugar(int $usuarioId, int $mazoid): array|bool {
     $db = (new Conexion())->getDb();
 
+   
     $stmt = $db->prepare("SELECT usuario FROM usuario WHERE id = :id");
     $stmt->bindParam(':id', $usuarioId, PDO::PARAM_INT);
     $stmt->execute();
     $usuarioNombre = $stmt->fetchColumn();
 
     if (!$usuarioNombre) {
-        return false;
+        return ['error' => 'Usuario no válido'];
     }
 
-    if ($this->lePerteneceElMazo($db, $usuarioId, $mazoid)) {
-        $query = "INSERT INTO partida (usuario_id, el_usuario, fecha, mazo_id, estado)
-                  VALUES (:usuario_id, :el_usuario, NOW(), :mazo_id, :estado)";
-        $stmt = $db->prepare($query);
-        $estado = 'en_curso';
-        $stmt->bindParam(':usuario_id', $usuarioId);
-        $stmt->bindParam(':el_usuario', $usuarioNombre);
-        $stmt->bindParam(':mazo_id', $mazoid);
-        $stmt->bindParam(':estado', $estado);
-
-        if ($stmt->execute()) {
-            $partida_id = $db->lastInsertId();
-            $this->actualizarTodasLasCartas($db, $mazoid, 'en_mano');
-            $this->actualizarTodasLasCartas($db, 1, 'en_mano'); 
-
-            return ['partida_id' => $partida_id];
-        }
+   
+    $stmt = $db->prepare("SELECT COUNT(*) FROM partida WHERE usuario_id = :usuario_id AND estado = 'en_curso'");
+    $stmt->bindParam(':usuario_id', $usuarioId);
+    $stmt->execute();
+    if ($stmt->fetchColumn() > 0) {
+        return ['error' => 'Ya tienes una partida en curso'];
     }
 
-    return false;
+    
+    if (!$this->lePerteneceElMazo($db, $usuarioId, $mazoid)) {
+        return ['error' => 'El mazo no te pertenece'];
+    }
+
+  
+    $query = "INSERT INTO partida (usuario_id, el_usuario, fecha, mazo_id, estado)
+              VALUES (:usuario_id, :el_usuario, NOW(), :mazo_id, 'en_curso')";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':usuario_id', $usuarioId);
+    $stmt->bindParam(':el_usuario', $usuarioNombre);
+    $stmt->bindParam(':mazo_id', $mazoid);
+
+    if ($stmt->execute()) {
+        $partida_id = $db->lastInsertId();
+
+        
+        $this->actualizarTodasLasCartas($db, $mazoid, 'en_mano');
+        $this->actualizarTodasLasCartas($db, 1, 'en_mano');
+
+        return ['partida_id' => $partida_id];
+    }
+
+    return ['error' => 'No se pudo crear la partida por un error inesperado'];
 }
     
     public function verificarPertenenciaMazo($usuarioId, $mazoId): bool {

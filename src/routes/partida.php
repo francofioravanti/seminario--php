@@ -12,7 +12,7 @@ return function (App $app) {
     $servicio = new Partida();
     $data = $request->getParsedBody();
     $mazoid = $data['mazo_id'] ?? null;
-    $usuario_id = $request->getAttribute('usuario'); 
+    $usuario_id = $request->getAttribute('usuario');
 
     if (!$mazoid) {
         $response->getBody()->write(json_encode(['error' => 'Falta el ID del mazo']));
@@ -21,7 +21,7 @@ return function (App $app) {
 
     $resultado = $servicio->puedeJugar($usuario_id, $mazoid); 
 
-    if (is_array($resultado)) {
+    if (isset($resultado['partida_id'])) {
         $response->getBody()->write(json_encode([
             'mensaje' => 'Partida creada correctamente',
             'partida_id' => $resultado['partida_id']
@@ -29,7 +29,7 @@ return function (App $app) {
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    $response->getBody()->write(json_encode(['error' => 'No se pudo crear la partida']));
+    $response->getBody()->write(json_encode(['error' => $resultado['error'] ?? 'No se pudo crear la partida']));
     return $response->withStatus(403)->withHeader('Content-Type', 'application/json');
 })->add(IsLoggedMiddleware::class);
 

@@ -8,7 +8,7 @@ class Mazo{
        
 
 
-        //verifico unicidad.
+        
         if (count($cartas) !== count(array_unique($cartas))) {
             return 'Las cartas deben tener IDs distintos.';
         }
@@ -16,7 +16,7 @@ class Mazo{
             return 'Solo se permiten 5 cartas como máximo.';
         }
        
-        //verifico que todas existan.
+       
         foreach ($cartas as $idCarta) {
             $stmt = $db->prepare("SELECT id FROM carta WHERE id = ?");
             $stmt->execute([$idCarta]);
@@ -25,7 +25,7 @@ class Mazo{
             }
         }
        
-        //verificar que el usuario tenga menos de 3 mazo creados.
+        
         $query="SELECT count(*) AS total FROM mazo WHERE usuario_id = :usuario_id";
         $stmt=$db->prepare($query);
         $stmt->bindParam(':usuario_id',$usuario_id);
@@ -37,7 +37,7 @@ class Mazo{
         }
 
       
-        //realizar el insert del Mazo en la tabla mazo.
+       
         $query="INSERT INTO mazo (usuario_id,nombre)
                 VALUES (:usuario_id,:nombre)";
         $stmt=$db->prepare($query);
@@ -48,7 +48,7 @@ class Mazo{
 
         if ($mazoid){
            
-            //realizar el insert de las cartas en la tabla mazo_carta.
+           
             $estado = 'en_mazo';
             $insertQuery = "INSERT INTO mazo_carta (mazo_id, carta_id, estado) VALUES ";
             $values = [];
@@ -59,7 +59,7 @@ class Mazo{
                 $params[":carta_id_$i"] = $cartaId;
             }
 
-            //agrego todos los valores separados por comas
+           
             $insertQuery .= implode(', ', $values);
 
             $stmt = $db->prepare($insertQuery);
@@ -91,11 +91,11 @@ class Mazo{
     if($result ['total']>0){
         throw new Exception("El mazo no puede ser eliminado debido a que participó en una partida.");
     }
-    // Eliminar el mazo
+   
     $stmt = $db->prepare("DELETE FROM mazo WHERE id = :mazo_id");
     $stmt->bindParam(':mazo_id',$mazoId);
     $stmt->execute();
-    if ($stmt->rowCount() > 0) {//Devuelve la cantidad de filas afectadas por la sentencia SQL 
+    if ($stmt->rowCount() > 0) {
         return ['mensaje' => 'Mazo eliminado correctamente'];
     } else {
         throw new Exception("No hay mazos para eliminar con ese ID. ");
@@ -114,7 +114,7 @@ class Mazo{
     public static function obtenerMazoConCartarDeUsuario($usuarioId):array{
         $db = (new Conexion())->getDb();
 
-        //BUSCO TODOS LOS MAZOS DEL SUUARIO LOGEUADO
+        
         $stmt = $db->prepare("SELECT id, nombre FROM mazo WHERE usuario_id = :usuarioId");
         $stmt->bindParam(':usuarioId', $usuarioId, PDO::PARAM_INT);
         $stmt->execute();
@@ -123,13 +123,13 @@ class Mazo{
         $mazos = [];
 
         foreach ($datosMazos as $mazo) {
-            // BUSCO TODOS LOS IDS DE LAS CARTAS DEL MAZO
+      
             $stmtCartas = $db->prepare("SELECT carta_id FROM mazo_carta WHERE mazo_id = :mazoId");
             $stmtCartas->bindParam(':mazoId', $mazo['id'], PDO::PARAM_INT);
             $stmtCartas->execute();
             $cartasIds = $stmtCartas->fetchAll(PDO::FETCH_COLUMN);
 
-           //BUSCO LOS NOMBRES DE LAS CARTAS CON ESOS IDS 
+         
             $nombresCartas = [];
             foreach ($cartasIds as $cartaId) {
                 $stmtNombre = $db->prepare("SELECT nombre FROM carta WHERE id = :id");
@@ -149,28 +149,32 @@ class Mazo{
         return $mazos;
     }
 
-    //lo que hace "AS" es generar una columna con el string q pongas desp
-    public static function buscarCartas(? string $nombre ,? string $atributo):array{
-        $db = (new Conexion())->getDb();
-        $query="SELECT carta.nombre, carta.ataque, carta.ataque_nombre, atributo.nombre AS atributo
-                FROM carta,atributo
-                WHERE carta.atributo_id = atributo.id";
-
-        //FILTRO LAS CARTAS POR NOMBRE O ATRIBUTO
-        if ($atributo !== null && $atributo !== '') {
-            $query .= " AND atributo.nombre LIKE '%$atributo%'";
-        }
     
-        if ($nombre !== null && $nombre !== '') {
-            $query .= " AND carta.nombre LIKE '%$nombre%'";
-        }
+public static function buscarCartas(?string $nombre, ?string $atributo): array {
+    $db = (new Conexion())->getDb();
+    $query = "SELECT carta.nombre, carta.ataque, carta.ataque_nombre, atributo.nombre AS atributo
+              FROM carta
+              JOIN atributo ON carta.atributo_id = atributo.id
+              WHERE 1 = 1";
 
-        $stmt = $db->prepare($query);
-        $stmt->execute();
-    
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+   
+    $params = [];
 
+    if ($atributo !== null && $atributo !== '') {
+        $query .= " AND carta.atributo_id = :atributo_id";
+        $params[':atributo_id'] = $atributo;
     }
+
+    if ($nombre !== null && $nombre !== '') {
+        $query .= " AND carta.nombre LIKE :nombre";
+        $params[':nombre'] = "%$nombre%";
+    }
+
+    $stmt = $db->prepare($query);
+    $stmt->execute($params);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 
 
