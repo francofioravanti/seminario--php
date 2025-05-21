@@ -4,11 +4,11 @@ require_once 'Usuario.php';
 class Partida{
 
     private function pertenece($carta_id , $mazo_id):bool{
-        $db=(new Conexion())->getDb(); //conecto con la base de datos
-        $query="SELECT * FROM mazo_carta WHERE mazo_id = :mazo_id AND carta_id = :carta_id AND estado = 'en_mazo'"; //guardo la consulta 
-        $stmt=$db->prepare($query); //preparo consulta
-        $stmt->bindParam(':mazo_id',$mazo_id); //le doy el valor a :mazo_id
-        $stmt->bindParam(':carta_id',$carta_id); //le doy el valor a :carta_id
+        $db=(new Conexion())->getDb(); 
+        $query="SELECT * FROM mazo_carta WHERE mazo_id = :mazo_id AND carta_id = :carta_id AND estado = 'en_mazo'"; 
+        $stmt=$db->prepare($query); 
+        $stmt->bindParam(':mazo_id',$mazo_id); 
+        $stmt->bindParam(':carta_id',$carta_id); 
         $stmt->execute();
         $result=$stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -60,11 +60,10 @@ class Partida{
         return $cartas;
     }
 
-
+// Obtener una carta del mazo del servidor que NO esté descartada y actualizar estado
     public function jugadaServidor(): int {
         $mazoServidor = 1;
-    
-        // 1. Obtener una carta del mazo del servidor que NO esté descartada
+
         $db = (new Conexion())->getDb();
         $query = "
             SELECT carta_id 
@@ -81,11 +80,8 @@ class Partida{
         if (!$carta) {
             throw new Exception("No hay cartas disponibles para el servidor.");
         }
-    
-        // 2. Actualizar el estado de la carta a 'descartado'
         $this->actualizarEstadoCarta($carta['carta_id'], $mazoServidor, 'descartado');
     
-        // 3. Devolver el ID de la carta jugada
         return $carta['carta_id'];
     }
     
