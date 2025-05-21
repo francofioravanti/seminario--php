@@ -10,27 +10,29 @@ class Conexion {
 
     public function conectar() {
         try {
-            echo "Intentando conectar...\n"; // <-- Agrega esto para depurar
+            echo "Intentando conectar...\n"; 
             $this->pdo = new PDO(
                 "mysql:host={$this->host};dbname={$this->db};charset={$this->charset}",
                 $this->user,
                 $this->pass
             );
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            echo "Conexion exitosa!\n"; // <-- Mensaje de confirmacion
+            echo "Conexion exitosa!\n"; 
         } catch (PDOException $e) {
             die("Error de conexion: " . $e->getMessage());
         }
     }
 
     public function getDb(): PDO {
-        if ($this->pdo === null) { // Verifica correctamente si la conexion no existe
+        if ($this->pdo === null) { 
             $this->conectar();
         }
         return $this->pdo;
     }
 
-
+    public function cerrarConexion() {
+        $this->pdo = null; 
+    }
 
 }
 ?>
