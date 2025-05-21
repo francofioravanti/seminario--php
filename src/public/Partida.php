@@ -121,11 +121,10 @@ class Partida{
     }
 
    
-    $stmt = $db->prepare("SELECT COUNT(*) FROM partida WHERE usuario_id = :usuario_id AND estado = 'en_curso'");
-    $stmt->bindParam(':usuario_id', $usuarioId);
+    $stmt = $db->prepare("SELECT COUNT(*) FROM partida WHERE estado = 'en_curso'");
     $stmt->execute();
     if ($stmt->fetchColumn() > 0) {
-        return ['error' => 'Ya tienes una partida en curso'];
+        return ['error' => 'Ya hay una partida en curso. Solo se permite una a la vez.'];
     }
 
     
