@@ -9,22 +9,22 @@ class Usuario{
     public function registrarUsuario(string $nombre,string $usuario, string $clave): array {
         $errores = [];
 
-        if (!$this->validarNombreUsuario($usuario, $errores)) return $errores; #Si no se cumple alguna condicion del usuario, llena el array
-        if (!$this->validarClave($clave, $errores)) return $errores; #Si no se cumple alguna condicion de la contraseña, llena el array
+        if (!$this->validarNombreUsuario($usuario, $errores)) return $errores; 
+        if (!$this->validarClave($clave, $errores)) return $errores;
 
-        $db = (new Conexion())->getDb(); #crea una nueva instancia de la clase Conexion e invoca al metodo getDb
+        $db = (new Conexion())->getDb(); 
 
-        if ($this->existeUsuario($usuario)) {  #Si el usuario esta en uso, llena el array
+        if ($this->existeUsuario($usuario)) {  
             $errores[] = "El nombre de usuario ya está en uso.";
             return $errores;
         }
-        #Si todas las condicines para registrar un usuario se cumplen... se registra un nuevo usuario
+        
 
         
-        $stmt = $db->prepare("INSERT INTO usuario (nombre,usuario,password) VALUES (:nombre,:usuario, :clave)");# Prepara una consulta SQL que va a insertar un nuevo registro en la tabla con los valores que pongas en :usuario y :clave.
+        $stmt = $db->prepare("INSERT INTO usuario (nombre,usuario,password) VALUES (:nombre,:usuario, :clave)");
         $stmt->bindParam(':nombre', $nombre);
-        $stmt->bindParam(':usuario', $usuario); #Asocia los parámetros de la consulta (:usuario y :clave) con los valores reales ($usuario y )
-        $stmt->bindParam(':clave', $clave); #$hash porq es la clave ya encriptada
+        $stmt->bindParam(':usuario', $usuario);
+        $stmt->bindParam(':clave', $clave); 
         
 
     
@@ -45,9 +45,9 @@ class Usuario{
         $db = (new Conexion())->getDb();
         $stmt = $db->prepare("SELECT id FROM usuario WHERE usuario = ?");
         $stmt->execute([$usuario]);
-        return (bool) $stmt->fetch(); # true si encontró algo, false si no
+        return (bool) $stmt->fetch(); 
     }
-    public function validarNombreUsuario(string $usuario, array &$errores): bool { #Se fija que el usuario ingresado cumple las condiciones
+    public function validarNombreUsuario(string $usuario, array &$errores): bool { 
         
         if (strlen($usuario) < 6 || strlen($usuario) > 20) {
             $errores[] = "El nombre de usuario debe tener entre 6 y 20 caracteres.";
@@ -114,7 +114,7 @@ class Usuario{
     $stmt->bindParam(':id', $id);
     $stmt->execute();
     $data = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $data ?: []; // si no hay nada, devuelve array vacío
+    return $data ?: [];
 }
 
 }
