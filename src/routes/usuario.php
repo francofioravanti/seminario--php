@@ -177,11 +177,15 @@ $app->post('/login', function (Request $request, Response $response) {
             return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
         }
 
-        $usuarioEnUrl = (int) $args['usuario'];
+        $usuarioEnUrl = $args['usuario'];
 
-        if ((int)$usuarioLogueadoId !== $usuarioEnUrl) {
-            $response->getBody()->write(json_encode(['error' => 'No tiene permisos para acceder a este usuario']));
-            return $response->withStatus(403)->withHeader('Content-Type', 'application/json');
+        if ($usuarioLogueadoId !== $usuarioEnUrl) {
+            $response->getBody()->write(json_encode([
+            'logueado_id' => $usuarioLogueadoId,
+            'url_id' => $usuarioEnUrl,
+            'error' => 'No tiene permisos para modificar este usuario'
+        ]));
+             return $response->withStatus(403)->withHeader('Content-Type', 'application/json');
         }
 
         $servicio = new Usuario();

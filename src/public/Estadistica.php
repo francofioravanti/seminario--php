@@ -5,8 +5,7 @@ class Estadistica {
 
     public function obtenerEstadisticas(): array {
         $db = (new Conexion())->getDb();
-        //HAGO LA CONSULTA SEPARANDO LOS TRES DIFERENTES RESUTLADOS EN COLUMNAS :)
-        //
+        
         $query = "SELECT u.nombre,
                   SUM(CASE WHEN p.el_usuario = 'gano' THEN 1 ELSE 0 END) AS gano,
                   SUM(CASE WHEN p.el_usuario = 'perdio' THEN 1 ELSE 0 END) AS perdio,

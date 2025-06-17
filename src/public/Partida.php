@@ -60,10 +60,11 @@ class Partida{
         return $cartas;
     }
 
-// Obtener una carta del mazo del servidor que NO esté descartada y actualizar estado
+
     public function jugadaServidor(): int {
         $mazoServidor = 1;
-
+    
+       
         $db = (new Conexion())->getDb();
         $query = "
             SELECT carta_id 
@@ -80,12 +81,15 @@ class Partida{
         if (!$carta) {
             throw new Exception("No hay cartas disponibles para el servidor.");
         }
+    
+        
         $this->actualizarEstadoCarta($carta['carta_id'], $mazoServidor, 'descartado');
     
+        
         return $carta['carta_id'];
     }
     
-    //PARA TESTEAR LOS DOS METODOS DE ABAJO HAY Q CREAR/INSERTAR UN MAZO 
+    
     private function lePerteneceElMazo($db,$id,$mazoid):bool{
         $query="SELECT * FROM mazo WHERE id = :mazo_id AND usuario_id = :usuario_id";
         $stmt = $db->prepare($query);
@@ -324,13 +328,5 @@ class Partida{
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-
 }
-
-
-
-
-
-
 ?>

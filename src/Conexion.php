@@ -33,7 +33,7 @@ class Conexion {
     public function cerrarConexion() {
         $this->pdo = null; 
     }
-
+    
 }
 ?>
 
