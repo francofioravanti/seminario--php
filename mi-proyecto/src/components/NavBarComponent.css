@@ -1,0 +1,32 @@
+.nav-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.nav-button {
+  color: white;
+  text-decoration: none;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-button:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.logout-btn {
+  background-color: transparent;
+}
+
+
