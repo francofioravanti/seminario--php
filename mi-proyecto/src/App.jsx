@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import HeaderComponent from './components/HeaderComponent';
+import FooterComponent from './components/FooterComponent';
 import './App.css';
 import { Flame } from 'lucide-react';
 import { Routes, Route } from 'react-router-dom';
@@ -15,7 +16,7 @@ function App() {
   };
 
   return (
-    <div>
+    <div className="app-container">
       <HeaderComponent
         isLoggedIn={!!token}
         username={username}
