@@ -1,0 +1,37 @@
+.registro-container {
+  max-width: 400px;
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box; 
+
+}
+
+input,
+button {
+  width: 100%;         
+  box-sizing: border-box; 
+}
+
+input {
+  padding: 10px;
+  font-size: 1rem;
+}
+
+button {
+  padding: 10px;
+  background-color: #457b9d;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.errores {
+  margin-top: 10px;
+  color: red;
+}

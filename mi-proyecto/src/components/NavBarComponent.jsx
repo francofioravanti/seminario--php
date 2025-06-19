@@ -1,13 +1,17 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import './NavBarComponent.css';
 
 function NavBarComponent({ isLoggedIn, username, onLogout }) {
+  const location = useLocation();
+
   return (
     <nav className="nav-right">
       {!isLoggedIn ? (
         <>
-          <Link to="/registro" className="nav-button">Registro</Link>
+          {location.pathname !== '/registro' && (
+            <Link to="/registro" className="nav-button">Registro</Link>
+          )}
           <Link to="/login" className="nav-button">Login</Link>
         </>
       ) : (

@@ -14,7 +14,7 @@ function HeaderComponent({ isLoggedIn, username, onLogout }) {
   return (
     <header className="header">
       <div className="header-left" onClick={handleClick}>
-        <Flame size={28} color="white" />
+        <Flame className ="logo" size={28} color="white" />
         <h1 className="titulo">Pokebattle</h1>
       </div>
       <NavBarComponent
