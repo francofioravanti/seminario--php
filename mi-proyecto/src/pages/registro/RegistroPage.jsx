@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import './RegistroPage.css'; 
+import { useNavigate } from 'react-router-dom';
+import './RegistroPage.css';
 
 function RegistroPage() {
   const [usuario, setUsuario] = useState('');
   const [nombre, setNombre] = useState('');
   const [password, setPassword] = useState('');
   const [errores, setErrores] = useState([]);
+  const navigate = useNavigate();
 
   const validarFormulario = () => {
     const nuevosErrores = [];
@@ -18,9 +20,7 @@ function RegistroPage() {
       nuevosErrores.push("El nombre debe tener entre 1 y 30 caracteres.");
     }
 
-    if (
-      !/^.*(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).*$/.test(password)
-    ) {
+    if (!/^.*(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).*$/.test(password)) {
       nuevosErrores.push("La contraseña debe tener al menos 8 caracteres con mayúsculas, minúsculas, números y símbolos.");
     }
 
@@ -28,11 +28,35 @@ function RegistroPage() {
     return nuevosErrores.length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (validarFormulario()) {
-      console.log("Formulario válido. Enviar datos al backend...");
-      // Acá iría el fetch al backend
+      try {
+        const response = await fetch('http://localhost:8000/registro', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            usuario,
+            nombre,
+            password
+          })
+        });
+
+        
+
+        if (response.ok) {
+          alert("¡Registro exitoso!");
+          navigate('/login');
+        } else {
+          const data = await response.json();
+          setErrores([data.error || "Error al registrar usuario."]);
+        }
+      } catch (error) {
+        setErrores(["Error de conexión con el servidor."]);
+      }
     }
   };
 

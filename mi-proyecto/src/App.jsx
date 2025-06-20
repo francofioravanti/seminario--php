@@ -23,9 +23,18 @@ function App() {
         onLogout={handleLogout}
       />
       <Routes>
-        <Route path="/" element={<h2>Bienvenido a Pokebattle</h2>} />
+        <Route
+          path="/"
+          element={
+          <div className="main-content">
+            <h2>Bienvenido a Pokebattle</h2>
+          </div>
+          }
+        />
+
         <Route path="/registro" element={<RegistroPage />} />
       </Routes>
+      <FooterComponent />
     </div>
   );
 }

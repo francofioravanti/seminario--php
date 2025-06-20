@@ -5,9 +5,11 @@
 }
 
 .app-container {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  padding-top: 60px;
+  box-sizing: border-box;
 }
 
 .main-content {
@@ -18,7 +20,10 @@
   width: 100%;
   text-align: center;
 }
-
+.page-content {
+  padding: 0 20px;
+  flex: 1;
+}
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -53,7 +58,4 @@
 
 .read-the-docs {
   color: #888;
-}
-.app-container {
-   padding-top: 100px; 
 }
