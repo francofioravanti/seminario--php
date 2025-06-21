@@ -10,14 +10,14 @@ class Conexion {
 
     public function conectar() {
         try {
-            echo "Intentando conectar...\n"; 
+            
             $this->pdo = new PDO(
                 "mysql:host={$this->host};dbname={$this->db};charset={$this->charset}",
                 $this->user,
                 $this->pass
             );
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            echo "Conexion exitosa!\n"; 
+           
         } catch (PDOException $e) {
             die("Error de conexion: " . $e->getMessage());
         }

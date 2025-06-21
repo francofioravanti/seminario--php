@@ -8,7 +8,7 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   box-sizing: border-box; 
-
+  background: linear-gradient(135deg, #000000 0%, #764ba2 100%);
 }
 
 input,

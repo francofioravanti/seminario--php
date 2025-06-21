@@ -1,4 +1,4 @@
-/* Contenedor principal del login */
+
 .login-container {
   min-height: 80vh;
   display: flex;
@@ -8,7 +8,7 @@
   background: linear-gradient(135deg, #000000 0%, #764ba2 100%);
 }
 
-/* Tarjeta del formulario de login */
+
 .login-card {
   background: white;
   border-radius: 12px;
@@ -30,7 +30,7 @@
   }
 }
 
-/* Header del login */
+
 .login-header {
   text-align: center;
   margin-bottom: 2rem;
@@ -49,18 +49,19 @@
   font-size: 0.95rem;
 }
 
-/* Formulario */
+
 .login-form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-/* Grupos de campos */
+
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+ 
 }
 
 .form-group label {
@@ -69,14 +70,15 @@
   font-size: 0.9rem;
 }
 
-/* Inputs */
+
 .form-group input {
   padding: 0.75rem 1rem;
-  border: 2px solid #e1e5e9;
+  border: 2px solid black;
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.3s ease;
   background-color: #fafafa;
+  color:black;
 }
 
 .form-group input:focus {
@@ -92,7 +94,7 @@
   opacity: 0.7;
 }
 
-/* Input con error */
+
 .form-group input.error {
   border-color: #e74c3c;
   background-color: #fdf2f2;
@@ -103,7 +105,7 @@
   box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
 }
 
-/* Mensaje de error */
+
 .error-message {
   background-color: #fdf2f2;
   color: #e74c3c;
@@ -114,7 +116,7 @@
   margin: 0.5rem 0;
 }
 
-/* Botón de login */
+
 .login-button {
   background: linear-gradient(135deg, #060607 0%, #764ba2 100%);
   color: white;
@@ -144,7 +146,7 @@
   box-shadow: none;
 }
 
-/* Footer del login */
+
 .login-footer {
   text-align: center;
   margin-top: 2rem;
@@ -170,7 +172,7 @@
   text-decoration: underline;
 }
 
-/* Responsive Design */
+
 @media (max-width: 480px) {
   .login-container {
     padding: 1rem 0.5rem;
