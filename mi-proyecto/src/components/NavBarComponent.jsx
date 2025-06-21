@@ -16,10 +16,12 @@ function NavBarComponent({ isLoggedIn, username, onLogout }) {
         </>
       ) : (
         <>
-          <span>Hola, {username}!</span>
-          <Link to="/mis-mazos" className="nav-button">Mis Mazos</Link>
-          <Link to="/editar-usuario" className="nav-button">Editar</Link>
-          <button onClick={onLogout} className="logout-btn">Cerrar Sesión</button>
+          <div className="nav-left-section">
+            <span className="welcome-text">Hola, {username}!</span>
+            <Link to="/mis-mazos" className="nav-button">Mis Mazos</Link>
+            <Link to="/editar-usuario" className="nav-button">Editar</Link>
+          </div>
+          <button onClick={onLogout} className="nav-button logout-btn">Cerrar sesión</button>
         </>
       )}
     </nav>
