@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RegistroPage.css';
-
+import FooterComponent from '../../components/FooterComponent';
 function RegistroPage() {
   const [usuario, setUsuario] = useState('');
   const [nombre, setNombre] = useState('');
@@ -109,6 +109,7 @@ function RegistroPage() {
           </div>
         </div>
       </div>
+      <FooterComponent />
     </div>
   );
 }

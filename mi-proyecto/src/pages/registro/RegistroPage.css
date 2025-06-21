@@ -5,11 +5,12 @@
   width: 100%;
   height: 100%;
   z-index: 999;
+  display: flex;
+  flex-direction: column;
 }
 
 .registro-container {
-  min-height: 100vh;
-  height: 100vh;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,27 +40,40 @@
   color: #333;
   margin-bottom: 0.5rem;
   font-size: 1.8rem;
+  font-weight: 600;
 }
 
 .registro-header p {
   color: #666;
   margin: 0;
+  font-size: 1rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 input {
   width: 100%;
   padding: 12px;
-  margin-bottom: 1rem;
   border: 2px solid #e1e1e1;
   border-radius: 8px;
   font-size: 1rem;
   box-sizing: border-box;
   transition: border-color 0.3s ease;
+  color: #333;
+  background: white;
 }
 
 input:focus {
   outline: none;
   border-color: #764ba2;
+}
+
+input::placeholder {
+  color: #999;
 }
 
 button {
@@ -74,6 +88,7 @@ button {
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
+  margin-top: 0.5rem;
 }
 
 button:hover {
@@ -84,15 +99,18 @@ button:hover {
 .errores {
   background: #fee;
   border: 1px solid #fcc;
-  border-radius: 4px;
+  border-radius: 8px;
   padding: 1rem;
   margin-top: 1rem;
   list-style: none;
+  margin-left: 0;
+  padding-left: 1rem;
 }
 
 .errores li {
   color: #c33;
   margin-bottom: 0.5rem;
+  font-size: 0.9rem;
 }
 
 .errores li:last-child {
@@ -106,6 +124,12 @@ button:hover {
   border-top: 1px solid #eee;
 }
 
+.registro-footer p {
+  color: #666;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
 .login-link {
   color: #764ba2;
   text-decoration: none;
@@ -114,4 +138,11 @@ button:hover {
 
 .login-link:hover {
   text-decoration: underline;
+}
+
+
+.registro-page .footer {
+  position: relative;
+  z-index: 1000;
+  margin-top: auto;
 }
