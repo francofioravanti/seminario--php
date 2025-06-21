@@ -62,35 +62,51 @@ function RegistroPage() {
 
   return (
     <div className="registro-container">
-      <h2>Registro de Usuario</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Usuario"
-          value={usuario}
-          onChange={(e) => setUsuario(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Nombre público"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Registrarse</button>
-      </form>
-      {errores.length > 0 && (
-        <ul className="errores">
-          {errores.map((err, i) => (
-            <li key={i}>{err}</li>
-          ))}
-        </ul>
-      )}
+      <div className="registro-form">
+        <div className="registro-header">
+          <h2>Registro de Usuario</h2>
+          <p>Crea tu cuenta de Pokebattle</p>
+        </div>
+        
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Usuario"
+            value={usuario}
+            onChange={(e) => setUsuario(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Nombre público"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button type="submit">Registrarse</button>
+        </form>
+        
+        {errores.length > 0 && (
+          <ul className="errores">
+            {errores.map((err, i) => (
+              <li key={i}>{err}</li>
+            ))}
+          </ul>
+        )}
+        
+        <div className="registro-footer">
+          <p>
+            ¿Ya tienes cuenta? {' '}
+            <a href="/login" className="login-link">
+              Inicia sesión aquí
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
