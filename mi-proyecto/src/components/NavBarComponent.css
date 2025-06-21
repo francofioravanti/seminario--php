@@ -1,25 +1,17 @@
 .nav-right {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 15px;
   flex: 1 1 auto;
   min-width: 0;
-  gap: 12px;
-}
-
-.nav-left-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .welcome-text {
   color: white;
   font-size: 16px;
   font-weight: 500;
-  white-space: nowrap;
-  margin-right: 8px;
+  margin-right: 10px;
 }
 
 .nav-button {
@@ -33,42 +25,97 @@
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
   white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .nav-button:hover {
   background-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-1px);
 }
 
-.logout-btn {
-  background-color: rgba(220, 53, 69, 0.8);
-  margin-left: auto;
+/* Menú hamburguesa */
+.menu-container {
+  position: relative;
 }
 
-.logout-btn:hover {
-  background-color: rgba(220, 53, 69, 1);
+.hamburger-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
 }
 
-/* Responsive design para pantallas pequeñas */
+.hamburger-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.hamburger-line {
+  width: 20px;
+  height: 2px;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+/* Menú desplegable */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 8px;
+  padding: 4px;
+  min-width: 150px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  margin-top: 5px;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  display: block;
+  width: calc(100% - 8px);
+  margin: 2px 4px;
+  padding: 10px 12px;
+  color: white;
+  text-decoration: none;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: left;
+  border-radius: 4px;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.logout-item {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 6px;
+  padding-top: 12px;
+  color: #ff6b6b;
+}
+
+.logout-item:hover {
+  background-color: rgba(220, 53, 69, 0.2);
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .nav-right {
-    flex-direction: column;
-    gap: 8px;
+  .welcome-text {
+    font-size: 14px;
   }
   
-  .nav-left-section {
-    justify-content: center;
-  }
-  
-  .logout-btn {
-    margin-left: 0;
-    width: 100%;
+  .dropdown-menu {
+    min-width: 120px;
   }
 }
-
-
