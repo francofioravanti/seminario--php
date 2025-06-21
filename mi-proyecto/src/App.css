@@ -1,4 +1,4 @@
-#root {
+.app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -8,8 +8,12 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding-top: 60px;
   box-sizing: border-box;
+}
+
+/* Solo aplicar padding-top cuando NO sea la página de login */
+.app-container:not(.login-page) {
+  padding-top: 60px;
 }
 
 .main-content {
