@@ -56,9 +56,14 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (response.ok) {
+        // Login exitoso
         localStorage.setItem('token', data.token);
-        localStorage.setItem('username', formData.username); 
-
+        localStorage.setItem('username', data.username || formData.username);
+        
+        // Disparar evento personalizado para notificar el cambio
+        window.dispatchEvent(new Event('authChange'));
+        
+        // Navegar a la página principal (ya no necesitas reload)
         navigate('/');
       } else {
         setError(data.error || 'Fallo el inicio de sesión');
