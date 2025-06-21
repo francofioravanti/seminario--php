@@ -7,7 +7,6 @@ import { Routes, Route } from 'react-router-dom';
 import RegistroPage from './pages/registro/RegistroPage';
 import LoginPage from './pages/login/LoginPage';
 
-
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [username, setUsername] = useState(localStorage.getItem('username'));
