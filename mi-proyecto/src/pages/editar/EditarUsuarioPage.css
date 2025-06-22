@@ -1,0 +1,47 @@
+.editar-container { 
+   min-height: 100vh; 
+   display: flex; 
+   align-items: center; 
+   justify-content: center; 
+   padding: 2rem 1rem; 
+   background: linear-gradient(135deg, black 0%, #764ba2 100%); 
+   margin: 0;
+   box-sizing: border-box;
+   
+ } 
+ 
+ 
+ .editar-card { 
+   background: white; 
+   border-radius: 12px; 
+   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
+   padding: 2.5rem; 
+   width: 100%; 
+   max-width: 400px; 
+   animation: slideUp 0.3s ease-out; 
+   
+ } 
+
+ 
+ .editar-header { 
+   text-align: center; 
+   margin-bottom: 2rem; 
+   color:black;
+ } 
+
+ .editar-card button {
+  background: linear-gradient(135deg, white 0%, #764ba2 100%);
+  color: black;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-shadow: 1px 1px 2px #764ba2;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.editar-card button:hover {
+  opacity: 0.9;
+}

@@ -126,10 +126,10 @@ $app->post('/login', function (Request $request, Response $response) {
         }
 
     
-        $usuarioEnUrl = (int) $args['usuario'];
+        $usuarioEnUrl = $args['usuario'];
 
    
-        if ((int)$usuarioLogueadoId !== (int)$usuarioEnUrl) {
+        if ($usuarioLogueadoId !== $usuarioEnUrl) {
             $response->getBody()->write(json_encode([
             'logueado_id' => $usuarioLogueadoId,
             'url_id' => $usuarioEnUrl,

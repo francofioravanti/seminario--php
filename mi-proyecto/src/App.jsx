@@ -6,6 +6,7 @@ import { Flame } from 'lucide-react';
 import { Routes, Route } from 'react-router-dom';
 import RegistroPage from './pages/registro/RegistroPage';
 import LoginPage from './pages/login/LoginPage';
+import EditarUsuarioPage from './pages/editar/EditarUsuarioPage';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -55,6 +56,7 @@ function App() {
         />
         <Route path="/registro" element={<RegistroPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/editar-usuario" element={<EditarUsuarioPage />} />
       </Routes>
       <FooterComponent />
     </div>
