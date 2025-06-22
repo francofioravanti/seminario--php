@@ -97,73 +97,67 @@ $app->post('/login', function (Request $request, Response $response) {
 
     
     $app->put('/usuarios/{usuario}', function (Request $request, Response $response, array $args) {
-        $data = $request->getParsedBody();
-        $errores = [];
+    $data = $request->getParsedBody();
+    $errores = [];
 
-    
-        if (empty($data['nombre'])) {
-            $errores[] = 'Falta el campo nombre.';
-        }
+    if (empty($data['nombre'])) {
+        $errores[] = 'Falta el campo nombre.';
+    }
 
-        if (empty($data['clave'])) {
-            $errores[] = 'Falta el campo clave.';
-        }
+    if (empty($data['clave'])) {
+        $errores[] = 'Falta el campo clave.';
+    }
 
-        if (!empty($errores)) {
-            $response->getBody()->write(json_encode(['errores' => $errores]));
-            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
-        }
+    if (!empty($errores)) {
+        $response->getBody()->write(json_encode(['errores' => $errores]));
+        return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+    }
 
-        $nombre = $data['nombre'];
-        $clave = $data['clave'];
+    $nombre = $data['nombre'];
+    $clave = $data['clave'];
 
-    
-        $usuarioLogueadoId = $request->getAttribute('usuario');
+    $usuarioLogueadoUsername = $request->getAttribute('usuario');
 
-        if (!$usuarioLogueadoId) {
-            $response->getBody()->write(json_encode(['error' => 'No está logueado']));
-            return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
-        }
+    if (!$usuarioLogueadoUsername) {
+        $response->getBody()->write(json_encode(['error' => 'No está logueado']));
+        return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
+    }
 
-    
-        $usuarioEnUrl = $args['usuario'];
+    $usuarioEnUrl = $args['usuario'];
 
-   
-        if ($usuarioLogueadoId !== $usuarioEnUrl) {
-            $response->getBody()->write(json_encode([
-            'logueado_id' => $usuarioLogueadoId,
+    if ($usuarioLogueadoUsername !== $usuarioEnUrl) {
+        $response->getBody()->write(json_encode([
+            'logueado_id' => $usuarioLogueadoUsername,
             'url_id' => $usuarioEnUrl,
             'error' => 'No tiene permisos para modificar este usuario'
-            ]));
-            return $response->withStatus(403)->withHeader('Content-Type', 'application/json');
-        }
+        ]));
+        return $response->withStatus(403)->withHeader('Content-Type', 'application/json');
+    }
 
-        $servicio = new Usuario();
+    $servicio = new Usuario();
 
-   
-        $erroresValidacion = [];
-        if (!$servicio->validarClave($clave, $erroresValidacion)) {
-         $errores[] = 'La nueva clave no cumple las condiciones.';
-        }
+    $erroresValidacion = [];
+    if (!$servicio->validarClave($clave, $erroresValidacion)) {
+        $errores[] = 'La nueva clave no cumple las condiciones.';
+    }
 
-        if (!$servicio->validarNombreUsuario($nombre, $erroresValidacion)) {
-            $errores[] = 'El nuevo nombre no cumple las condiciones.';
-        }
+    if (!$servicio->validarNombreUsuario($nombre, $erroresValidacion)) {
+        $errores[] = 'El nuevo nombre no cumple las condiciones.';
+    }
 
-        if (!empty($errores)) {
-            $response->getBody()->write(json_encode(['errores' => array_merge($errores, $erroresValidacion)]));
-            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
-        }
+    if (!empty($errores)) {
+        $response->getBody()->write(json_encode(['errores' => array_merge($errores, $erroresValidacion)]));
+        return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+    }
 
-        
-        if ($servicio->actualizarCredencialesPorId($usuarioLogueadoId, $nombre, $clave)) {
-            $response->getBody()->write(json_encode(['exito' => 'Se actualizó el usuario correctamente']));
-            return $response->withHeader('Content-Type', 'application/json');
-        } else {
-         $response->getBody()->write(json_encode(['error' => 'No se pudo actualizar el usuario']));
-          return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
-     }
-    })->add(\App\Application\Middleware\IsLoggedMiddleware::class);
+    if ($servicio->actualizarCredencialesPorNombre($usuarioLogueadoUsername, $nombre, $clave)) {
+        $response->getBody()->write(json_encode(['exito' => 'Se actualizó el usuario correctamente']));
+        return $response->withHeader('Content-Type', 'application/json');
+    } else {
+        $response->getBody()->write(json_encode(['error' => 'No se pudo actualizar el usuario']));
+        return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
+    }
+})->add(\App\Application\Middleware\IsLoggedMiddleware::class);
 
 
 

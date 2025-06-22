@@ -12,7 +12,7 @@ function App() {
   const [token, setToken] = useState(null);
   const [username, setUsername] = useState(null);
 
-  // Cargar token al iniciar
+ 
   useEffect(() => {
     const rawToken = localStorage.getItem('token');
     const storedUsername = localStorage.getItem('username');
@@ -36,7 +36,7 @@ function App() {
     }
   }, []);
 
-  // Escuchar evento personalizado para actualizar el estado después del login
+ 
   useEffect(() => {
     const handleAuthChange = () => {
       const newToken = localStorage.getItem('token');
