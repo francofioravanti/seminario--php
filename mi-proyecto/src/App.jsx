@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import HeaderComponent from './components/HeaderComponent';
 import FooterComponent from './components/FooterComponent';
@@ -7,6 +7,7 @@ import { Routes, Route } from 'react-router-dom';
 import RegistroPage from './pages/registro/RegistroPage';
 import LoginPage from './pages/login/LoginPage';
 import EditarUsuarioPage from './pages/editar/EditarUsuarioPage';
+import MisMazosPage from './pages/misMazos/MisMazosPage';
 
 function App() {
   const [token, setToken] = useState(null);
@@ -36,7 +37,6 @@ function App() {
     }
   }, []);
 
- 
   useEffect(() => {
     const handleAuthChange = () => {
       const newToken = localStorage.getItem('token');
@@ -77,6 +77,7 @@ function App() {
         <Route path="/registro" element={<RegistroPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/editar-usuario" element={<EditarUsuarioPage />} />
+        <Route path="/mis-mazos" element={<MisMazosPage />} />
       </Routes>
       <FooterComponent />
     </div>
