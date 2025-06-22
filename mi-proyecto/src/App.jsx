@@ -20,15 +20,20 @@ function App() {
     if (rawToken) {
       try {
         const decoded = jwtDecode(rawToken);
-        const now = Date.now() / 1000;
+        const now = new Date();
 
-        if (decoded.exp && decoded.exp > now) {
-          setToken(rawToken);
-          setUsername(storedUsername);
-        } else {
-          localStorage.removeItem('token');
-          localStorage.removeItem('username');
+        
+        if (decoded.expired_at) {
+          const expiryDate = new Date(decoded.expired_at);
+          if (expiryDate > now) {
+            setToken(rawToken);
+            setUsername(storedUsername);
+            return;
+          }
         }
+
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
       } catch (err) {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
@@ -36,7 +41,7 @@ function App() {
     }
   }, []);
 
- 
+  
   useEffect(() => {
     const handleAuthChange = () => {
       const newToken = localStorage.getItem('token');
@@ -50,6 +55,31 @@ function App() {
       window.removeEventListener('authChange', handleAuthChange);
     };
   }, []);
+
+  
+  useEffect(() => {
+    if (!token) return;
+
+    try {
+      const decoded = jwtDecode(token);
+      const now = new Date();
+
+      if (decoded.expired_at) {
+        const expiryDate = new Date(decoded.expired_at);
+        if (expiryDate > now) {
+          const timeUntilExpiry = expiryDate - now;
+
+          const timeoutId = setTimeout(() => {
+            handleLogout();
+          }, timeUntilExpiry);
+
+          return () => clearTimeout(timeoutId);
+        }
+      }
+    } catch (err) {
+      handleLogout();
+    }
+  }, [token]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
