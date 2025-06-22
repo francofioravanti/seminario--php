@@ -43,7 +43,7 @@ $app->post('/login', function (Request $request, Response $response) {
 
     $token = JWT::encode([
         "usuario" => $usuarioId,
-        "expired_at" => $expire
+        "exp" => $expire
     ], \App\Application\Middleware\IsLoggedMiddleware::$secret, 'HS256');
 
     

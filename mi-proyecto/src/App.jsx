@@ -13,7 +13,6 @@ function App() {
   const [token, setToken] = useState(null);
   const [username, setUsername] = useState(null);
 
- 
   useEffect(() => {
     const rawToken = localStorage.getItem('token');
     const storedUsername = localStorage.getItem('username');
@@ -21,16 +20,12 @@ function App() {
     if (rawToken) {
       try {
         const decoded = jwtDecode(rawToken);
-        const now = new Date();
+        const now = Math.floor(Date.now() / 1000); // segundos
 
-        
-        if (decoded.expired_at) {
-          const expiryDate = new Date(decoded.expired_at);
-          if (expiryDate > now) {
-            setToken(rawToken);
-            setUsername(storedUsername);
-            return;
-          }
+        if (decoded.exp && decoded.exp > now) {
+          setToken(rawToken);
+          setUsername(storedUsername);
+          return;
         }
 
         localStorage.removeItem('token');
@@ -56,25 +51,23 @@ function App() {
     };
   }, []);
 
-  
   useEffect(() => {
     if (!token) return;
 
     try {
       const decoded = jwtDecode(token);
-      const now = new Date();
+      const now = Math.floor(Date.now() / 1000);
 
-      if (decoded.expired_at) {
-        const expiryDate = new Date(decoded.expired_at);
-        if (expiryDate > now) {
-          const timeUntilExpiry = expiryDate - now;
+      if (decoded.exp && decoded.exp > now) {
+        const timeUntilExpiry = (decoded.exp - now) * 1000;
 
-          const timeoutId = setTimeout(() => {
-            handleLogout();
-          }, timeUntilExpiry);
+        const timeoutId = setTimeout(() => {
+          handleLogout();
+        }, timeUntilExpiry);
 
-          return () => clearTimeout(timeoutId);
-        }
+        return () => clearTimeout(timeoutId);
+      } else {
+        handleLogout();
       }
     } catch (err) {
       handleLogout();
