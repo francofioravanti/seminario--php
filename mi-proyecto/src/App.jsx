@@ -1,33 +1,53 @@
 import { useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import HeaderComponent from './components/HeaderComponent';
 import FooterComponent from './components/FooterComponent';
 import './App.css';
-import { Flame } from 'lucide-react';
 import { Routes, Route } from 'react-router-dom';
 import RegistroPage from './pages/registro/RegistroPage';
 import LoginPage from './pages/login/LoginPage';
 import EditarUsuarioPage from './pages/editar/EditarUsuarioPage';
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  const [username, setUsername] = useState(localStorage.getItem('username'));
+  const [token, setToken] = useState(null);
+  const [username, setUsername] = useState(null);
 
- 
+  // Cargar token al iniciar
   useEffect(() => {
-    const handleStorageChange = () => {
-      setToken(localStorage.getItem('token'));
-      setUsername(localStorage.getItem('username'));
+    const rawToken = localStorage.getItem('token');
+    const storedUsername = localStorage.getItem('username');
+
+    if (rawToken) {
+      try {
+        const decoded = jwtDecode(rawToken);
+        const now = Date.now() / 1000;
+
+        if (decoded.exp && decoded.exp > now) {
+          setToken(rawToken);
+          setUsername(storedUsername);
+        } else {
+          localStorage.removeItem('token');
+          localStorage.removeItem('username');
+        }
+      } catch (err) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+      }
+    }
+  }, []);
+
+  // Escuchar evento personalizado para actualizar el estado después del login
+  useEffect(() => {
+    const handleAuthChange = () => {
+      const newToken = localStorage.getItem('token');
+      const newUsername = localStorage.getItem('username');
+      setToken(newToken);
+      setUsername(newUsername);
     };
 
-    
-    window.addEventListener('storage', handleStorageChange);
-
-    
-    window.addEventListener('authChange', handleStorageChange);
-
+    window.addEventListener('authChange', handleAuthChange);
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('authChange', handleStorageChange);
+      window.removeEventListener('authChange', handleAuthChange);
     };
   }, []);
 
@@ -49,9 +69,9 @@ function App() {
         <Route
           path="/"
           element={
-          <div className="main-content">
-            <h2>Bienvenido a Pokebattle</h2>
-          </div>
+            <div className="main-content">
+              <h2>Bienvenido a Pokebattle</h2>
+            </div>
           }
         />
         <Route path="/registro" element={<RegistroPage />} />

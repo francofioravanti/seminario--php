@@ -56,14 +56,12 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-       
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.username || formData.username);
-        
-        
+
+        // 🔁 Disparar evento para que App.jsx actualice estado
         window.dispatchEvent(new Event('authChange'));
-        
-        
+
         navigate('/');
       } else {
         setError(data.error || 'Fallo el inicio de sesión');

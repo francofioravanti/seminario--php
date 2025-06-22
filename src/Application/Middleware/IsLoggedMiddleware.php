@@ -29,17 +29,17 @@ class IsLoggedMiddleware implements Middleware
 {
     try {
         if ($request->hasHeader("Authorization")) {
-            // Limpia correctamente el header si viene como "Bearer <token>"
+            
             $rawHeader = $request->getHeaderLine("Authorization");
             $token = trim(str_replace('Bearer ', '', $rawHeader));
 
             if (!empty($token)) {
                 $key = new Key(self::$secret, "HS256");
 
-                // Decodificar el token
+                
                 $dataToken = JWT::decode($token, $key);
 
-                // Validar expiración
+               
                 $now = (new \DateTime("now"))->format("Y-m-d H:i:s");
                 if ($dataToken->expired_at < $now) {
                     $response = $this->responseFactory->createResponse();
@@ -47,13 +47,13 @@ class IsLoggedMiddleware implements Middleware
                     return $response->withHeader("Content-Type", "application/json")->withStatus(401);
                 }
 
-                // Si es válido, inyectamos el ID de usuario al request
+                
                 $request = $request->withAttribute('usuario', $dataToken->usuario);
                 return $handler->handle($request);
             }
         }
 
-        // No hay token
+       
         $response = $this->responseFactory->createResponse();
         $response->getBody()->write(json_encode(["error" => 'Acción requiere login'], JSON_UNESCAPED_UNICODE));
         return $response->withHeader("Content-Type", "application/json")->withStatus(401);
