@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './MisMazosPage.css';
 
 const MisMazosPage = () => {
@@ -14,75 +15,56 @@ const MisMazosPage = () => {
     cargarMazos();
   }, []);
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+  };
+
   const cargarMazos = async () => {
     try {
       setLoading(true);
-      setError(''); // Limpiar errores previos
+      setError('');
 
       const token = localStorage.getItem('token');
       const username = localStorage.getItem('username');
+      const userId = localStorage.getItem('userId');
 
-      if (!token || !username) {
+      if (!token || !username || !userId) {
         setError('No estás logueado');
         setLoading(false);
         return;
       }
 
       setUser(username);
-      
-      const response = await fetch('http://localhost:8000/mazos', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+
+      const response = await axios.get(`http://localhost:8000/usuarios/${userId}/mazos`, {
+        headers: getAuthHeaders()
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Datos recibidos:', data); // Debug
-        
-        // Asegurar que mazos sea siempre un array
-        if (Array.isArray(data)) {
-          setMazos(data);
-        } else if (data && Array.isArray(data.mazos)) {
-          setMazos(data.mazos);
-        } else if (data && typeof data === 'object') {
-          // Si data es un objeto pero no tiene mazos, puede ser que los mazos estén en la raíz
-          const possibleMazos = Object.values(data).find(val => Array.isArray(val));
-          setMazos(possibleMazos || []);
-        } else {
-          setMazos([]);
-        }
-        
-        // NO establecer error si la carga fue exitosa
-        setError('');
+      const data = response.data;
+
+      if (Array.isArray(data)) {
+        setMazos(data);
+      } else if (data.mazos && Array.isArray(data.mazos)) {
+        setMazos(data.mazos);
       } else {
-        // Solo manejar error si realmente hay un problema con la respuesta
-        if (response.status === 401) {
-          setError('Sesión expirada. Por favor, inicia sesión nuevamente.');
-          // Opcional: redirigir a login
-        } else if (response.status === 404) {
-          // 404 podría significar que no hay mazos, no necesariamente un error
-          setMazos([]);
-          setError('');
-        } else {
-          const text = await response.text();
-          try {
-            const errorData = JSON.parse(text);
-            setError(errorData.error || 'Error al cargar los mazos');
-          } catch {
-            setError(`Error del servidor (${response.status})`);
-          }
-        }
+        const fallback = Object.values(data).find((val) => Array.isArray(val));
+        setMazos(fallback || []);
       }
+
     } catch (error) {
       console.error('Error al cargar mazos:', error);
-      // Solo mostrar error de conexión si realmente no se pudo conectar
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        setError('Error de conexión. Verifica que el servidor esté funcionando.');
+      if (error.response) {
+        if (error.response.status === 401) {
+          setError('Sesión expirada. Por favor, inicia sesión nuevamente.');
+        } else {
+          setError(error.response.data?.error || `Error al cargar los mazos`);
+        }
       } else {
-        setError('Error inesperado al cargar mazos');
+        setError('Error de conexión');
       }
     } finally {
       setLoading(false);
@@ -101,75 +83,34 @@ const MisMazosPage = () => {
     }
 
     try {
-      setError(''); // Limpiar errores previos
-      const token = localStorage.getItem('token');
+      setError('');
+      await axios.post(
+        'http://localhost:8000/mazos',
+        { nombre: newMazoName.trim(), cartas: [] },
+        { headers: getAuthHeaders() }
+      );
 
-      console.log('Creando mazo con nombre:', newMazoName.trim());
-
-      const response = await fetch('http://localhost:8000/mazos', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          nombre: newMazoName.trim(),
-          cartas: []
-        })
-      });
-
-      if (response.ok) {
-        console.log('Mazo creado correctamente');
-        setNewMazoName('');
-        setShowCreateForm(false);
-        await cargarMazos(); // Esperar a que se recarguen los mazos
-      } else {
-        const text = await response.text();
-        console.warn('Error respuesta crear mazo:', text);
-        try {
-          const errorData = JSON.parse(text);
-          setError(errorData.error || 'Error al crear el mazo');
-        } catch {
-          setError('Error inesperado del servidor');
-        }
-      }
+      setNewMazoName('');
+      setShowCreateForm(false);
+      await cargarMazos();
     } catch (error) {
       console.error('Error al crear mazo:', error);
-      setError('Error de conexión');
+      setError(error.response?.data?.error || 'Error al crear el mazo');
     }
   };
 
   const eliminarMazo = async (mazoId) => {
-    if (!window.confirm('¿Estás seguro de que quieres eliminar este mazo?')) {
-      return;
-    }
+    if (!window.confirm('¿Estás seguro de que quieres eliminar este mazo?')) return;
 
     try {
-      setError(''); // Limpiar errores previos
-      const token = localStorage.getItem('token');
-
-      const response = await fetch(`http://localhost:8000/mazos/${mazoId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+      setError('');
+      await axios.delete(`http://localhost:8000/mazos/${mazoId}`, {
+        headers: getAuthHeaders()
       });
-
-      if (response.ok) {
-        await cargarMazos(); // Esperar a que se recarguen los mazos
-      } else {
-        const text = await response.text();
-        try {
-          const errorData = JSON.parse(text);
-          setError(errorData.error || 'Error al eliminar el mazo');
-        } catch {
-          setError('Error inesperado del servidor');
-        }
-      }
+      await cargarMazos();
     } catch (error) {
       console.error('Error al eliminar mazo:', error);
-      setError('Error de conexión');
+      setError(error.response?.data?.error || 'Error al eliminar el mazo');
     }
   };
 
@@ -180,45 +121,26 @@ const MisMazosPage = () => {
     }
 
     try {
-      setError(''); // Limpiar errores previos
-      const token = localStorage.getItem('token');
+      setError('');
+      await axios.put(
+        `http://localhost:8000/mazos/${mazoId}`,
+        { nombre: newName.trim() },
+        { headers: getAuthHeaders() }
+      );
 
-      const response = await fetch(`http://localhost:8000/mazos/${mazoId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          nombre: newName.trim()
-        })
-      });
-
-      if (response.ok) {
-        setEditingMazo(null);
-        await cargarMazos(); // Esperar a que se recarguen los mazos
-      } else {
-        const text = await response.text();
-        try {
-          const errorData = JSON.parse(text);
-          setError(errorData.error || 'Error al intentar editar el mazo');
-        } catch {
-          setError('Error inesperado del servidor');
-        }
-      }
+      setEditingMazo(null);
+      await cargarMazos();
     } catch (error) {
       console.error('Error al editar mazo:', error);
-      setError('Error de conexión');
+      setError(error.response?.data?.error || 'Error al editar el mazo');
     }
   };
 
   const jugarConMazo = (mazoId) => {
-    console.log('Jugar con mazo:', mazoId);
     alert('Función de jugar aún no implementada');
   };
 
   const verCartasDeMazo = (mazoId) => {
-    console.log('Ver cartas del mazo:', mazoId);
     alert('Función de ver cartas aún no implementada');
   };
 
@@ -235,8 +157,6 @@ const MisMazosPage = () => {
       <div className="mis-mazos-container">
         <h1>Mis Mazos</h1>
         {user && <p className="welcome-message">Bienvenido, {user}</p>}
-        
-        {/* Solo mostrar error si hay uno y no está vacío */}
         {error && error.trim() !== '' && (
           <div className="error-message">{error}</div>
         )}
@@ -264,7 +184,7 @@ const MisMazosPage = () => {
                 <button onClick={() => {
                   setShowCreateForm(false);
                   setNewMazoName('');
-                  setError(''); // Limpiar error al cancelar
+                  setError('');
                 }} className="btn-cancel">Cancelar</button>
               </div>
             </div>

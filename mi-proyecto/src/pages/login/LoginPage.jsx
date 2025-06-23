@@ -47,7 +47,8 @@ const LoginPage = () => {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.username || formData.username);
-        window.dispatchEvent(new Event('storage')); // 🔁 notifica a App.jsx
+        localStorage.setItem('userId', data.id);
+        window.dispatchEvent(new Event('storage')); 
         navigate('/');
       } else {
         setError(data.error || 'Fallo el inicio de sesión');

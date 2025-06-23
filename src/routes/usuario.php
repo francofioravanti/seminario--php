@@ -42,10 +42,12 @@ $app->post('/login', function (Request $request, Response $response) {
         "usuario" => $usuarioId,
         "exp" => $exp
     ], \App\Application\Middleware\IsLoggedMiddleware::$secret, 'HS256');
-
+    //
     $response->getBody()->write(json_encode([
         'mensaje' => 'Login correcto',
-        'token' => $token
+        'token' => $token,
+        'username' => $usuarioData['nombre'], 
+        'id' => $usuarioId                    
     ]));
 
     return $response->withHeader("Content-Type", "application/json");
