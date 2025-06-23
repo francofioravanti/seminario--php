@@ -14,38 +14,39 @@ return function (App $app) {
 
    
     $app->post('/mazos', function(Request $request, Response $response) {
-        $data = $request->getParsedBody();
-        $errores = [];
+    $data = $request->getParsedBody();
+    $errores = [];
 
-        if (empty($data['nombre']) || trim($data['nombre']) === '') {
-            $errores[] = 'El campo nombre del mazo es obligatorio.';
-        }
+    if (empty($data['nombre']) || trim($data['nombre']) === '') {
+        $errores[] = 'El campo nombre del mazo es obligatorio.';
+    }
 
-        if (empty($data['cartas']) || !is_array($data['cartas'])) {
-            $errores[] = 'El campo cartas es obligatorio y debe ser un arreglo.';
-        }
+    
+    if (!isset($data['cartas']) || !is_array($data['cartas'])) {
+        $errores[] = 'El campo cartas es obligatorio y debe ser un arreglo.';
+    }
 
-        if (!empty($errores)) {
-            $response->getBody()->write(json_encode(['errores' => $errores]));
-            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
-        }
+    if (!empty($errores)) {
+        $response->getBody()->write(json_encode(['errores' => $errores]));
+        return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+    }
 
-        $nombreMazo = trim($data['nombre']);
-        $cartas = $data['cartas'];
+    $nombreMazo = trim($data['nombre']);
+    $cartas = $data['cartas'];
 
-        $usuario_id = $request->getAttribute('usuario'); 
+    $usuario_id = $request->getAttribute('usuario'); 
 
-        $mazo = new Mazo();
-        $resultado = $mazo->crearMazo($usuario_id, $nombreMazo, $cartas);
+    $mazo = new Mazo();
+    $resultado = $mazo->crearMazo($usuario_id, $nombreMazo, $cartas);
 
-        if (is_array($resultado)) {
-            $response->getBody()->write(json_encode($resultado));
-            return $response->withHeader('Content-Type', 'application/json');
-        } else {
-            $response->getBody()->write(json_encode(['error' => $resultado]));
-            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
-        }
-    })->add(\App\Application\Middleware\IsLoggedMiddleware::class);
+    if (is_array($resultado)) {
+        $response->getBody()->write(json_encode($resultado));
+        return $response->withHeader('Content-Type', 'application/json');
+    } else {
+        $response->getBody()->write(json_encode(['error' => $resultado]));
+        return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+    }
+})->add(\App\Application\Middleware\IsLoggedMiddleware::class);
 
     $app->delete('/mazos/{mazo}', function(Request $request, Response $response, array $args) { 
     $mazoId = (int)$args['mazo'];

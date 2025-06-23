@@ -17,17 +17,19 @@ const MisMazosPage = () => {
   const cargarMazos = async () => {
     try {
       setLoading(true);
-      setError('');
+      setError(''); // Limpiar errores previos
 
       const token = localStorage.getItem('token');
       const username = localStorage.getItem('username');
 
       if (!token || !username) {
         setError('No estás logueado');
+        setLoading(false);
         return;
       }
 
       setUser(username);
+      
       const response = await fetch('http://localhost:8000/mazos', {
         method: 'GET',
         headers: {
@@ -38,14 +40,50 @@ const MisMazosPage = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setMazos(data.mazos || []);
+        console.log('Datos recibidos:', data); // Debug
+        
+        // Asegurar que mazos sea siempre un array
+        if (Array.isArray(data)) {
+          setMazos(data);
+        } else if (data && Array.isArray(data.mazos)) {
+          setMazos(data.mazos);
+        } else if (data && typeof data === 'object') {
+          // Si data es un objeto pero no tiene mazos, puede ser que los mazos estén en la raíz
+          const possibleMazos = Object.values(data).find(val => Array.isArray(val));
+          setMazos(possibleMazos || []);
+        } else {
+          setMazos([]);
+        }
+        
+        // NO establecer error si la carga fue exitosa
+        setError('');
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Error al cargar los mazos');
+        // Solo manejar error si realmente hay un problema con la respuesta
+        if (response.status === 401) {
+          setError('Sesión expirada. Por favor, inicia sesión nuevamente.');
+          // Opcional: redirigir a login
+        } else if (response.status === 404) {
+          // 404 podría significar que no hay mazos, no necesariamente un error
+          setMazos([]);
+          setError('');
+        } else {
+          const text = await response.text();
+          try {
+            const errorData = JSON.parse(text);
+            setError(errorData.error || 'Error al cargar los mazos');
+          } catch {
+            setError(`Error del servidor (${response.status})`);
+          }
+        }
       }
     } catch (error) {
-      console.error('Error:', error);
-      setError('Error de conexión');
+      console.error('Error al cargar mazos:', error);
+      // Solo mostrar error de conexión si realmente no se pudo conectar
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        setError('Error de conexión. Verifica que el servidor esté funcionando.');
+      } else {
+        setError('Error inesperado al cargar mazos');
+      }
     } finally {
       setLoading(false);
     }
@@ -63,8 +101,10 @@ const MisMazosPage = () => {
     }
 
     try {
-      setError('');
+      setError(''); // Limpiar errores previos
       const token = localStorage.getItem('token');
+
+      console.log('Creando mazo con nombre:', newMazoName.trim());
 
       const response = await fetch('http://localhost:8000/mazos', {
         method: 'POST',
@@ -79,26 +119,33 @@ const MisMazosPage = () => {
       });
 
       if (response.ok) {
+        console.log('Mazo creado correctamente');
         setNewMazoName('');
         setShowCreateForm(false);
-        cargarMazos();
+        await cargarMazos(); // Esperar a que se recarguen los mazos
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Error al crear el mazo');
+        const text = await response.text();
+        console.warn('Error respuesta crear mazo:', text);
+        try {
+          const errorData = JSON.parse(text);
+          setError(errorData.error || 'Error al crear el mazo');
+        } catch {
+          setError('Error inesperado del servidor');
+        }
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error al crear mazo:', error);
       setError('Error de conexión');
     }
   };
 
   const eliminarMazo = async (mazoId) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este mazo?')) {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar este mazo?')) {
       return;
     }
 
     try {
-      setError('');
+      setError(''); // Limpiar errores previos
       const token = localStorage.getItem('token');
 
       const response = await fetch(`http://localhost:8000/mazos/${mazoId}`, {
@@ -110,13 +157,18 @@ const MisMazosPage = () => {
       });
 
       if (response.ok) {
-        cargarMazos();
+        await cargarMazos(); // Esperar a que se recarguen los mazos
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Error al eliminar el mazo');
+        const text = await response.text();
+        try {
+          const errorData = JSON.parse(text);
+          setError(errorData.error || 'Error al eliminar el mazo');
+        } catch {
+          setError('Error inesperado del servidor');
+        }
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error al eliminar mazo:', error);
       setError('Error de conexión');
     }
   };
@@ -128,7 +180,7 @@ const MisMazosPage = () => {
     }
 
     try {
-      setError('');
+      setError(''); // Limpiar errores previos
       const token = localStorage.getItem('token');
 
       const response = await fetch(`http://localhost:8000/mazos/${mazoId}`, {
@@ -144,13 +196,18 @@ const MisMazosPage = () => {
 
       if (response.ok) {
         setEditingMazo(null);
-        cargarMazos();
+        await cargarMazos(); // Esperar a que se recarguen los mazos
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Error al editar el mazo');
+        const text = await response.text();
+        try {
+          const errorData = JSON.parse(text);
+          setError(errorData.error || 'Error al intentar editar el mazo');
+        } catch {
+          setError('Error inesperado del servidor');
+        }
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error al editar mazo:', error);
       setError('Error de conexión');
     }
   };
@@ -178,7 +235,11 @@ const MisMazosPage = () => {
       <div className="mis-mazos-container">
         <h1>Mis Mazos</h1>
         {user && <p className="welcome-message">Bienvenido, {user}</p>}
-        {error && <div className="error-message">{error}</div>}
+        
+        {/* Solo mostrar error si hay uno y no está vacío */}
+        {error && error.trim() !== '' && (
+          <div className="error-message">{error}</div>
+        )}
 
         <div className="create-mazo-section">
           {!showCreateForm ? (
@@ -203,7 +264,7 @@ const MisMazosPage = () => {
                 <button onClick={() => {
                   setShowCreateForm(false);
                   setNewMazoName('');
-                  setError('');
+                  setError(''); // Limpiar error al cancelar
                 }} className="btn-cancel">Cancelar</button>
               </div>
             </div>

@@ -2,84 +2,74 @@
 class Mazo{
 
 
-    public function crearMazo(int $usuario_id,string $nombreMazo,array $cartas){
-        $db = (new Conexion())->getDb();
+    public function crearMazo(int $usuario_id, string $nombreMazo, array $cartas) {
+    $db = (new Conexion())->getDb();
 
-       
+    if (count($cartas) !== count(array_unique($cartas))) {
+        return 'Las cartas deben tener IDs distintos.';
+    }
+    if (count($cartas) > 5) {
+        return 'Solo se permiten 5 cartas como máximo.';
+    }
 
-
-        
-        if (count($cartas) !== count(array_unique($cartas))) {
-            return 'Las cartas deben tener IDs distintos.';
+    foreach ($cartas as $idCarta) {
+        $stmt = $db->prepare("SELECT id FROM carta WHERE id = ?");
+        $stmt->execute([$idCarta]);
+        if (!$stmt->fetch()) {
+            return "La carta con ID $idCarta no existe.";
         }
-        if (count($cartas) > 5) {
-            return 'Solo se permiten 5 cartas como máximo.';
+    }
+
+    $query = "SELECT count(*) AS total FROM mazo WHERE usuario_id = :usuario_id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':usuario_id', $usuario_id);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $cantidad = $result['total'];
+    if ($cantidad >= 3) {
+        return "Ya tenés 3 mazos creados.";
+    }
+
+    $query = "INSERT INTO mazo (usuario_id, nombre) VALUES (:usuario_id, :nombre)";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':usuario_id', $usuario_id);
+    $stmt->bindParam(':nombre', $nombreMazo);
+    $stmt->execute();
+    $mazoid = $db->lastInsertId();
+
+    if ($mazoid) {
+    if (count($cartas) > 0) {
+        $estado = 'en_mazo';
+        $insertQuery = "INSERT INTO mazo_carta (mazo_id, carta_id, estado) VALUES ";
+        $values = [];
+        $params = [];
+
+        foreach ($cartas as $i => $cartaId) {
+            $values[] = "(:mazo_id_$i, :carta_id_$i, :estado_$i)";
+            $params[":mazo_id_$i"] = $mazoid;
+            $params[":carta_id_$i"] = $cartaId;
+            $params[":estado_$i"] = $estado;
         }
-       
-       
-        foreach ($cartas as $idCarta) {
-            $stmt = $db->prepare("SELECT id FROM carta WHERE id = ?");
-            $stmt->execute([$idCarta]);
-            if (!$stmt->fetch()) {
-                return "La carta con ID $idCarta no existe.";
-            }
-        }
-       
-        
-        $query="SELECT count(*) AS total FROM mazo WHERE usuario_id = :usuario_id";
-        $stmt=$db->prepare($query);
-        $stmt->bindParam(':usuario_id',$usuario_id);
-        $stmt->execute();
-        $result=$stmt->fetch(PDO::FETCH_ASSOC);
-        $cantidad = $result['total'];
-        if ($cantidad>=3){
-            return "Ya tenés 3 mazos creados.";
+
+        $insertQuery .= implode(', ', $values);
+
+        $stmt = $db->prepare($insertQuery);
+
+        foreach ($params as $param => $value) {
+            $stmt->bindValue($param, $value);
         }
 
-      
-       
-        $query="INSERT INTO mazo (usuario_id,nombre)
-                VALUES (:usuario_id,:nombre)";
-        $stmt=$db->prepare($query);
-        $stmt->bindParam(':usuario_id',$usuario_id);
-        $stmt->bindParam(':nombre',$nombreMazo);     
-        $stmt->execute();
-        $mazoid = $db->lastInsertId();
-
-        if ($mazoid){
-           
-           
-            $estado = 'en_mazo';
-            $insertQuery = "INSERT INTO mazo_carta (mazo_id, carta_id, estado) VALUES ";
-            $values = [];
-            $params = [];
-
-            foreach ($cartas as $i => $cartaId) {
-                $values[] = "(:mazo_id, :carta_id_$i, :estado)";
-                $params[":carta_id_$i"] = $cartaId;
-            }
-
-           
-            $insertQuery .= implode(', ', $values);
-
-            $stmt = $db->prepare($insertQuery);
-            $stmt->bindParam(':mazo_id', $mazoid);
-            $stmt->bindParam(':estado', $estado);
-
-            foreach ($params as $param => $value) {
-                $stmt->bindValue($param, $value);
-            }
-
-            $exito = $stmt->execute();
-            if($exito){
-                return  ['mazo_id' => $mazoid, 'nombre' => $nombreMazo];;
-            }
+        $exito = $stmt->execute();
+        if (!$exito) {
             return "No se pudo crear el mazo";
         }
-        
-        
-
     }
+    
+    
+    return ['mazo_id' => $mazoid, 'nombre' => $nombreMazo];
+}
+
+}
 
   public function eliminarMazo($mazoId): array {
     $db = (new Conexion())->getDb();

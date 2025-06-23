@@ -3,21 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  });
-
+  const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
     if (error) setError('');
   };
 
@@ -35,18 +28,14 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
-
     setIsLoading(true);
     setError('');
 
     try {
       const response = await fetch('http://localhost:8000/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           usuario: formData.username,
           password: formData.password
@@ -58,10 +47,7 @@ const LoginPage = () => {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.username || formData.username);
-
-        // 🔁 Disparar evento para que App.jsx actualice estado
-        window.dispatchEvent(new Event('authChange'));
-
+        window.dispatchEvent(new Event('storage')); // 🔁 notifica a App.jsx
         navigate('/');
       } else {
         setError(data.error || 'Fallo el inicio de sesión');
@@ -111,27 +97,16 @@ const LoginPage = () => {
             />
           </div>
 
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+          {error && <div className="error-message">{error}</div>}
 
-          <button
-            type="submit"
-            className="login-button"
-            disabled={isLoading}
-          >
+          <button type="submit" className="login-button" disabled={isLoading}>
             {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
         </form>
 
         <div className="login-footer">
           <p>
-            ¿No tienes cuenta?{' '}
-            <a href="/registro" className="register-link">
-              Regístrate aquí
-            </a>
+            ¿No tienes cuenta? <a href="/registro" className="register-link">Regístrate aquí</a>
           </p>
         </div>
       </div>

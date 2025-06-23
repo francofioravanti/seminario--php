@@ -13,63 +13,50 @@ function App() {
   const [token, setToken] = useState(null);
   const [username, setUsername] = useState(null);
 
-  useEffect(() => {
+  const syncToken = () => {
     const rawToken = localStorage.getItem('token');
     const storedUsername = localStorage.getItem('username');
 
     if (rawToken) {
       try {
         const decoded = jwtDecode(rawToken);
-        const now = Math.floor(Date.now() / 1000); // segundos
+        const now = Math.floor(Date.now() / 1000);
 
         if (decoded.exp && decoded.exp > now) {
           setToken(rawToken);
           setUsername(storedUsername);
           return;
         }
-
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
-      } catch (err) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
-      }
+      } catch (err) {}
     }
-  }, []);
+
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    setToken(null);
+    setUsername(null);
+  };
+
+  useEffect(syncToken, []);
 
   useEffect(() => {
-    const handleAuthChange = () => {
-      const newToken = localStorage.getItem('token');
-      const newUsername = localStorage.getItem('username');
-      setToken(newToken);
-      setUsername(newUsername);
-    };
-
-    window.addEventListener('authChange', handleAuthChange);
-    return () => {
-      window.removeEventListener('authChange', handleAuthChange);
-    };
+    window.addEventListener('storage', syncToken);
+    return () => window.removeEventListener('storage', syncToken);
   }, []);
 
   useEffect(() => {
     if (!token) return;
-
     try {
       const decoded = jwtDecode(token);
       const now = Math.floor(Date.now() / 1000);
 
       if (decoded.exp && decoded.exp > now) {
         const timeUntilExpiry = (decoded.exp - now) * 1000;
-
-        const timeoutId = setTimeout(() => {
-          handleLogout();
-        }, timeUntilExpiry);
-
+        const timeoutId = setTimeout(() => handleLogout(), timeUntilExpiry);
         return () => clearTimeout(timeoutId);
       } else {
         handleLogout();
       }
-    } catch (err) {
+    } catch {
       handleLogout();
     }
   }, [token]);

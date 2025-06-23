@@ -17,7 +17,6 @@ $app->post('/login', function (Request $request, Response $response) {
     $usuario = $data['usuario'] ?? null;
     $clave = $data['password'] ?? null;
 
-   
     if (!$usuario || !$clave) {
         $errores = [];
         if (!$usuario) $errores[] = 'Falta el campo usuario';
@@ -35,18 +34,15 @@ $app->post('/login', function (Request $request, Response $response) {
         return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
     }
 
-    
     $usuarioId = $usuarioData['id'];
 
-   
-    $expire = (new DateTime("now"))->modify("+1 hour")->format("Y-m-d H:i:s");
+    $exp = time() + 3600; 
 
     $token = JWT::encode([
         "usuario" => $usuarioId,
-        "exp" => $expire
+        "exp" => $exp
     ], \App\Application\Middleware\IsLoggedMiddleware::$secret, 'HS256');
 
-    
     $response->getBody()->write(json_encode([
         'mensaje' => 'Login correcto',
         'token' => $token
