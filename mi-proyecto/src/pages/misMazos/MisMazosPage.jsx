@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './MisMazosPage.css';
+import { useNavigate } from 'react-router-dom';
 
 const MisMazosPage = () => {
   const [user, setUser] = useState(null);
@@ -10,7 +11,7 @@ const MisMazosPage = () => {
   const [newMazoName, setNewMazoName] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
+  const navigate = useNavigate();
   useEffect(() => {
     cargarMazos();
   }, []);
@@ -165,7 +166,7 @@ const MisMazosPage = () => {
           {!showCreateForm ? (
             <button
               className="btn-create-mazo"
-              onClick={() => setShowCreateForm(true)}
+              onClick={() => navigate('/crear-mazo')}
               disabled={mazos.length >= 3}
             >
               {mazos.length >= 3 ? 'Máximo 3 mazos alcanzado' : 'Crear Nuevo Mazo'}

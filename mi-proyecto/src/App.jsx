@@ -9,6 +9,7 @@ import RegistroPage from './pages/registro/RegistroPage';
 import LoginPage from './pages/login/LoginPage';
 import EditarUsuarioPage from './pages/editar/EditarUsuarioPage';
 import MisMazosPage from './pages/misMazos/MisMazosPage';
+import CrearMazoPage from './pages/misMazos/CrearMazoPage';
 
 function App() {
   const [token, setToken] = useState(null);
@@ -89,6 +90,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/editar-usuario" element={<EditarUsuarioPage />} />
         <Route path="/mis-mazos" element={<MisMazosPage />} />
+        <Route path="/crear-mazo" element={<CrearMazoPage />} />
       </Routes>
       <FooterComponent />
     </div>

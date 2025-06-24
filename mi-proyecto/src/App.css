@@ -11,7 +11,7 @@
   box-sizing: border-box;
 }
 
-/* Solo aplicar padding-top cuando NO sea la página de login */
+
 .app-container:not(.login-page) {
   padding-top: 60px;
 }
