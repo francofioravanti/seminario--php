@@ -180,9 +180,20 @@ const MisMazosPage = () => {
         />
       </div>
       <div className="carta-info">
-        <h4>{carta.nombre}</h4>
-        <p>Ataque: {carta.ataque}</p>
-        <p>Tipo: {carta.atributo}</p>
+        <h3 className="carta-nombre">{carta.nombre}</h3>
+        <div className="carta-stats">
+          <div className="stat-item">
+            <span className="stat-label">Ataque:</span>
+            <span className="stat-value">{carta.ataque}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Atributo:</span>
+            <span className={`stat-value tipo-badge tipo-${carta.atributo.toLowerCase()}`}>{carta.atributo}</span>
+          </div>
+        </div>
+        <div className="carta-id">
+          <small>ID: {carta.id}</small>
+        </div>
       </div>
     </div>
   );

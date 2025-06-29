@@ -188,11 +188,13 @@ const CrearMazoPage = () => {
         return;
       }
       // Solo IDs únicos de cartas
+      console.log('Cartas seleccionadas:', cartasSeleccionadas); // <-- Agrega esto
       const cartasIds = [...new Set(cartasSeleccionadas.filter(carta => typeof carta.id === 'number').map(carta => carta.id))];
       const datosParaEnviar = {
         nombre: nombreMazo.trim(),
         cartas: cartasIds
       };
+      console.log('Datos que se enviarán al backend:', datosParaEnviar); //
       await axios.post('http://localhost:8000/mazos', datosParaEnviar, {
         headers: {
           'Authorization': `Bearer ${token}`,

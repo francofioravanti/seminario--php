@@ -152,27 +152,21 @@ class Mazo{
     
 public static function buscarCartas(?string $nombre, ?string $atributo): array {
     $db = (new Conexion())->getDb();
-    $query = "SELECT carta.nombre, carta.ataque, carta.ataque_nombre, atributo.nombre AS atributo
+    $query = "SELECT carta.id, carta.nombre, carta.ataque, carta.ataque_nombre, atributo.nombre AS atributo
               FROM carta
               JOIN atributo ON carta.atributo_id = atributo.id
               WHERE 1 = 1";
-
-   
     $params = [];
-
     if ($atributo !== null && $atributo !== '') {
         $query .= " AND carta.atributo_id = :atributo_id";
         $params[':atributo_id'] = $atributo;
     }
-
     if ($nombre !== null && $nombre !== '') {
         $query .= " AND carta.nombre LIKE :nombre";
         $params[':nombre'] = "%$nombre%";
     }
-
     $stmt = $db->prepare($query);
     $stmt->execute($params);
-
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
