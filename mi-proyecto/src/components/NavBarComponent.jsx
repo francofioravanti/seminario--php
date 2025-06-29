@@ -39,7 +39,7 @@ function NavBarComponent({ isLoggedIn, username, onLogout }) {
                   Mazos
                 </Link>
                 <Link to="/editar-usuario" className="dropdown-item " onClick={closeMenu}>
-                  Editar Usuario
+                  Editar usuario
                 </Link>
                 <button onClick={() => { onLogout(); closeMenu(); }} className="dropdown-item " >
                   Cerrar sesión
