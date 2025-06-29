@@ -22,7 +22,7 @@ function NavBarComponent({ isLoggedIn, username, onLogout }) {
           {location.pathname !== '/registro' && (
             <Link to="/registro" className="nav-button">Registro</Link>
           )}
-          <Link to="/login" className="nav-button">Login</Link>
+          <Link to="/login" className="nav-button">Iniciar Sesión</Link>
         </>
       ) : (
         <>
