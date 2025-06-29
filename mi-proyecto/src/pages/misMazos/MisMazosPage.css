@@ -435,10 +435,10 @@
 .tipo-agua { background: linear-gradient(135deg, #3498db, #2980b9); }
 .tipo-fuego { background: linear-gradient(135deg, #e74c3c, #c0392b); }
 .tipo-planta { background: linear-gradient(135deg, #27ae60, #229954); }
-.tipo-electrico { background: linear-gradient(135deg, #f1c40f, #f39c12); }
-.tipo-psiquico { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
 .tipo-tierra { background: linear-gradient(135deg, #d35400, #e67e22); }
 .tipo-normal { background: linear-gradient(135deg, #95a5a6, #7f8c8d); }
+.tipo-volador { background: linear-gradient(135deg, #51accf, #136469); }
+.tipo-piedra { background: linear-gradient(135deg, #7c5814, #b36e07); }
 
 .carta-descripcion {
   margin-top: 10px;

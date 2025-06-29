@@ -4,7 +4,7 @@ import axios from 'axios';
 import HeaderComponent from './components/HeaderComponent';
 import FooterComponent from './components/FooterComponent';
 import './App.css';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import RegistroPage from './pages/registro/RegistroPage';
 import LoginPage from './pages/login/LoginPage';
 import EditarUsuarioPage from './pages/editar/EditarUsuarioPage';
@@ -14,6 +14,7 @@ import CrearMazoPage from './pages/misMazos/CrearMazoPage';
 function App() {
   const [token, setToken] = useState(null);
   const [username, setUsername] = useState(null);
+  const navigate = useNavigate();
 
   const syncToken = () => {
     const rawToken = localStorage.getItem('token');
@@ -68,6 +69,7 @@ function App() {
     localStorage.removeItem('username');
     setToken(null);
     setUsername(null);
+    navigate('/'); // Redirige a la página de inicio
   };
 
   return (
