@@ -1,4 +1,4 @@
-import fondoTablero from '../../../assets/fondo-tablero-poke.png';
+import fondoTablero from '../../../assets/fondo-tablero-poke2.png';
 import React from 'react';
 import PlayerCard from './PlayerCard';
 import ServerCard from './ServerCard';
