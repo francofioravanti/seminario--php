@@ -99,7 +99,13 @@ class Mazo{
             return $stmt->execute();    
     }
 
-
+    public function obtenerCartasDeMazo($mazoId) {
+        $db = (new Conexion())->getDb();
+        $stmt = $db->prepare("SELECT c.id, c.nombre, c.ataque, a.nombre as atributo FROM mazo_carta mc JOIN carta c ON mc.carta_id = c.id JOIN atributo a ON c.atributo_id = a.id WHERE mc.mazo_id = :mazoId");
+        $stmt->bindParam(':mazoId', $mazoId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
    public static function obtenerMazoConCartarDeUsuario($usuarioId): array {
     $db = (new Conexion())->getDb();
@@ -108,7 +114,7 @@ class Mazo{
         return [];
     }
 
-    $stmt = $db->prepare("SELECT id, nombre FROM mazo WHERE usuario_id = :usuarioId OR usuario_id IS NULL");
+    $stmt = $db->prepare("SELECT id, nombre FROM mazo WHERE usuario_id = :usuarioId");
     $stmt->bindParam(':usuarioId', $usuarioId, PDO::PARAM_INT);
     $stmt->execute();
     $datosMazos = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -116,30 +122,33 @@ class Mazo{
     $mazos = [];
 
     foreach ($datosMazos as $mazo) {
-        $stmtCartas = $db->prepare("SELECT carta_id FROM mazo_carta WHERE mazo_id = :mazoId");
+        $stmtCartas = $db->prepare("SELECT c.id, c.nombre, c.ataque, a.nombre as atributo FROM mazo_carta mc JOIN carta c ON mc.carta_id = c.id JOIN atributo a ON c.atributo_id = a.id WHERE mc.mazo_id = :mazoId");
         $stmtCartas->bindParam(':mazoId', $mazo['id'], PDO::PARAM_INT);
         $stmtCartas->execute();
-        $cartasIds = $stmtCartas->fetchAll(PDO::FETCH_COLUMN);
-
-        $nombresCartas = [];
-        foreach ($cartasIds as $cartaId) {
-            $stmtNombre = $db->prepare("SELECT nombre FROM carta WHERE id = :id");
-            $stmtNombre->bindParam(':id', $cartaId, PDO::PARAM_INT);
-            $stmtNombre->execute();
-            $nombre = $stmtNombre->fetchColumn();
-            if ($nombre) {
-                $nombresCartas[] = $nombre;
-            }
-        }
+        $cartas = $stmtCartas->fetchAll(PDO::FETCH_ASSOC);
         $mazos[] = [
-            'nombre_mazo' => $mazo['nombre'],
-            'cartas' => $nombresCartas
+            'id' => (int)$mazo['id'],
+            'nombre' => $mazo['nombre'], 
+            'cartas' => $cartas
         ];
     }
 
     return $mazos;
 }
 
+#//foreach ($datosMazos as $mazo) {
+ #   $stmtCartas = $db->prepare("SELECT c.id, c.nombre, c.ataque, a.nombre as atributo FROM mazo_carta mc JOIN carta c ON mc.carta_id = c.id JOIN atributo a ON c.atributo_id = a.id WHERE mc.mazo_id = :mazoId");
+  #  $stmtCartas->bindParam(':mazoId', $mazo['id'], PDO::PARAM_INT);
+   # $stmtCartas->execute();
+   # $cartas = $stmtCartas->fetchAll(PDO::FETCH_ASSOC);
+    #$mazos[] = [
+   #     'id' => (int)$mazo['id'],
+    #    'nombre' => $mazo['nombre'],
+     #   'cartas' => $cartas
+   # ];
+#}
+#return ['id' => (int)$mazoid, 'nombre' => $nombreMazo];
+#
     
 public static function buscarCartas(?string $nombre, ?string $atributo): array {
     $db = (new Conexion())->getDb();
@@ -173,3 +182,4 @@ public static function buscarCartas(?string $nombre, ?string $atributo): array {
 
 
 ?>
+

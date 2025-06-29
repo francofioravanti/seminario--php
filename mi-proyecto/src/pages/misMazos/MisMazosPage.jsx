@@ -11,7 +11,10 @@ const MisMazosPage = () => {
   const [newMazoName, setNewMazoName] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [viewingMazo, setViewingMazo] = useState(null);
+  const [cartasMazo, setCartasMazo] = useState([]);
   const navigate = useNavigate();
+
   useEffect(() => {
     cargarMazos();
   }, []);
@@ -45,24 +48,35 @@ const MisMazosPage = () => {
         headers: getAuthHeaders()
       });
 
+      console.log('Datos recibidos del backend:', response.data);
+
       const data = response.data;
 
-      if (Array.isArray(data)) {
-        setMazos(data);
-      } else if (data.mazos && Array.isArray(data.mazos)) {
-        setMazos(data.mazos);
-      } else {
-        const fallback = Object.values(data).find((val) => Array.isArray(val));
-        setMazos(fallback || []);
+      // Verificar que los datos sean un array
+      if (!Array.isArray(data)) {
+        console.error('Los datos recibidos no son un array:', data);
+        setError('Error en el formato de datos del servidor');
+        setMazos([]);
+        return;
       }
 
+      // Verificar que cada mazo tenga la estructura correcta
+      const mazosFormateados = data.map(mazo => ({
+        id: mazo.id,
+        nombre: mazo.nombre,
+        cartas: Array.isArray(mazo.cartas) ? mazo.cartas : []
+      }));
+
+      setMazos(mazosFormateados);
     } catch (error) {
       console.error('Error al cargar mazos:', error);
       if (error.response) {
         if (error.response.status === 401) {
           setError('Sesión expirada. Por favor, inicia sesión nuevamente.');
+        } else if (error.response.status === 403) {
+          setError('No tienes permisos para acceder a estos mazos.');
         } else {
-          setError(error.response.data?.error || `Error al cargar los mazos`);
+          setError(error.response.data?.error || 'Error al cargar los mazos');
         }
       } else {
         setError('Error de conexión');
@@ -118,6 +132,7 @@ const MisMazosPage = () => {
   const editarMazo = async (mazoId, newName) => {
     if (!newName.trim()) {
       setError('El nombre del mazo no puede estar vacío');
+      setEditingMazo(null); // Cancelar edición
       return;
     }
 
@@ -134,15 +149,47 @@ const MisMazosPage = () => {
     } catch (error) {
       console.error('Error al editar mazo:', error);
       setError(error.response?.data?.error || 'Error al editar el mazo');
+      setEditingMazo(null);
     }
   };
 
-  const jugarConMazo = (mazoId) => {
-    alert('Función de jugar aún no implementada');
+  const verCartasDeMazo = (mazoId) => {
+    const mazo = mazos.find(m => m.id === mazoId);
+    setCartasMazo(mazo ? mazo.cartas : []);
+    setViewingMazo(mazoId);
   };
 
-  const verCartasDeMazo = (mazoId) => {
-    alert('Función de ver cartas aún no implementada');
+  const jugarConMazo = (mazoId) => {
+    navigate(`/jugar/${mazoId}`);
+  };
+
+  const obtenerImagenPokemon = (nombreCarta) => {
+    const nombreFormateado = nombreCarta.toLowerCase().replace(/\s+/g, '-');
+    return `https://img.pokemondb.net/artwork/large/${nombreFormateado}.jpg`;
+  };
+
+  const CartaComponent = ({ carta }) => (
+    <div className="carta-item">
+      <div className="carta-imagen">
+        <img
+          src={obtenerImagenPokemon(carta.nombre)}
+          alt={carta.nombre}
+          onError={(e) => {
+            e.target.src = '/flame.svg';
+          }}
+        />
+      </div>
+      <div className="carta-info">
+        <h4>{carta.nombre}</h4>
+        <p>Ataque: {carta.ataque}</p>
+        <p>Tipo: {carta.atributo}</p>
+      </div>
+    </div>
+  );
+
+  // Función para cancelar edición
+  const cancelarEdicion = () => {
+    setEditingMazo(null);
   };
 
   if (loading) {
@@ -153,43 +200,52 @@ const MisMazosPage = () => {
     );
   }
 
+  if (viewingMazo) {
+    return (
+      <div className="mis-mazos-page">
+        <div className="mis-mazos-container">
+          <div className="mazo-viewer">
+            <div className="mazo-viewer-header">
+              <button 
+                onClick={() => {
+                  setViewingMazo(null);
+                  setCartasMazo([]);
+                }} 
+                className="btn-back"
+              >
+                ← Volver a Mis Mazos
+              </button>
+              <h2>Cartas del Mazo</h2>
+            </div>
+            
+            <div className="cartas-grid">
+              {cartasMazo.map((carta, index) => (
+                <CartaComponent key={`${carta.id}-${index}`} carta={carta} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mis-mazos-page">
       <div className="mis-mazos-container">
         <h1>Mis Mazos</h1>
-        {user && <p className="welcome-message">Bienvenido, {user}</p>}
-        {error && error.trim() !== '' && (
+        
+        {error && (
           <div className="error-message">{error}</div>
         )}
 
         <div className="create-mazo-section">
-          {!showCreateForm ? (
-            <button
-              className="btn-create-mazo"
-              onClick={() => navigate('/crear-mazo')}
-              disabled={mazos.length >= 3}
-            >
-              {mazos.length >= 3 ? 'Máximo 3 mazos alcanzado' : 'Crear Nuevo Mazo'}
-            </button>
-          ) : (
-            <div className="create-form">
-              <input
-                type="text"
-                placeholder="Nombre del mazo"
-                value={newMazoName}
-                onChange={(e) => setNewMazoName(e.target.value)}
-                maxLength={50}
-              />
-              <div className="form-buttons">
-                <button onClick={crearMazo} className="btn-save">Crear</button>
-                <button onClick={() => {
-                  setShowCreateForm(false);
-                  setNewMazoName('');
-                  setError('');
-                }} className="btn-cancel">Cancelar</button>
-              </div>
-            </div>
-          )}
+          <button
+            className="btn-create-mazo"
+            onClick={() => navigate('/crear-mazo')}
+            disabled={mazos.length >= 3}
+          >
+            {mazos.length >= 3 ? 'Máximo 3 mazos alcanzado' : 'Crear Nuevo Mazo'}
+          </button>
         </div>
 
         <div className="mazos-list">
@@ -205,26 +261,63 @@ const MisMazosPage = () => {
                         type="text"
                         defaultValue={mazo.nombre}
                         onKeyPress={(e) => {
-                          if (e.key === 'Enter') editarMazo(mazo.id, e.target.value);
+                          if (e.key === 'Enter') {
+                            editarMazo(mazo.id, e.target.value);
+                          }
+                          if (e.key === 'Escape') {
+                            cancelarEdicion();
+                          }
                         }}
                         onBlur={(e) => editarMazo(mazo.id, e.target.value)}
                         autoFocus
                       />
+                      <button 
+                        onClick={cancelarEdicion}
+                        className="btn-cancel-edit"
+                        title="Cancelar edición"
+                      >
+                        ✕
+                      </button>
                     </div>
                   ) : (
-                    <h3 className="mazo-name">{mazo.nombre}</h3>
+                    <div className="mazo-title">
+                      <h3 className="mazo-name">{mazo.nombre || 'Sin nombre'}</h3>
+                      <button 
+                        onClick={() => setEditingMazo(mazo.id)} 
+                        className="btn-edit-icon"
+                        title="Editar nombre"
+                      >
+                        ✏️
+                      </button>
+                    </div>
                   )}
                 </div>
 
                 <div className="mazo-info">
-                  <p>Cartas: {mazo.cartas ? mazo.cartas.length : 0}</p>
+                  <p className="mazo-details">
+                    Cartas: {mazo.cartas ? mazo.cartas.length : 0}
+                  </p>
                 </div>
 
                 <div className="mazo-actions">
-                  <button onClick={() => verCartasDeMazo(mazo.id)} className="btn-action btn-view">Ver</button>
-                  <button onClick={() => setEditingMazo(mazo.id)} className="btn-action btn-edit">Editar</button>
-                  <button onClick={() => eliminarMazo(mazo.id)} className="btn-action btn-delete">Eliminar</button>
-                  <button onClick={() => jugarConMazo(mazo.id)} className="btn-action btn-play">Jugar</button>
+                  <button 
+                    onClick={() => verCartasDeMazo(mazo.id)} 
+                    className="btn-action btn-view"
+                  >
+                    Ver Mazo
+                  </button>
+                  <button 
+                    onClick={() => eliminarMazo(mazo.id)} 
+                    className="btn-action btn-delete"
+                  >
+                    Eliminar
+                  </button>
+                  <button 
+                    onClick={() => jugarConMazo(mazo.id)} 
+                    className="btn-action btn-play"
+                  >
+                    Jugar
+                  </button>
                 </div>
               </div>
             ))
