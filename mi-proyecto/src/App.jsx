@@ -10,6 +10,7 @@ import LoginPage from './pages/login/LoginPage';
 import EditarUsuarioPage from './pages/editar/EditarUsuarioPage';
 import MisMazosPage from './pages/misMazos/MisMazosPage';
 import CrearMazoPage from './pages/misMazos/CrearMazoPage';
+import StatPage from './pages/stat/StatPage';
 
 function App() {
   const [token, setToken] = useState(null);
@@ -80,14 +81,7 @@ function App() {
         onLogout={handleLogout}
       />
       <Routes>
-        <Route
-          path="/"
-          element={
-            <div className="main-content">
-              <h2>Bienvenido a Pokebattle</h2>
-            </div>
-          }
-        />
+        <Route path="/" element={<StatPage />} />
         <Route path="/registro" element={<RegistroPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/editar-usuario" element={<EditarUsuarioPage />} />
