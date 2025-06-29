@@ -17,7 +17,17 @@ function StatPage() {
   const cargarEstadisticas = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const response = await axios.get('http://localhost:8000/estadisticas');
+      console.log('Respuesta completa:', response);
+      console.log('Datos recibidos:', response.data);
+      console.log('Tipo de datos:', typeof response.data);
+      console.log('Es array:', Array.isArray(response.data));
+      
+      if (!response.data || !Array.isArray(response.data)) {
+        throw new Error('Formato de datos inválido');
+      }
       
       const datosFormateados = Object.entries(response.data).map(([nombre, stats]) => {
         const totalPartidas = stats.ganó + stats.perdió + stats.empató;
@@ -35,8 +45,9 @@ function StatPage() {
       
       setEstadisticas(datosFormateados);
     } catch (error) {
-      console.error('Error al cargar estadísticas:', error);
-      setError('Error al cargar las estadísticas');
+      console.error('Error completo:', error);
+      console.error('Respuesta del error:', error.response);
+      setError('Error al cargar estadísticas: ' + error.message);
     } finally {
       setLoading(false);
     }

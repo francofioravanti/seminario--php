@@ -11,6 +11,7 @@ import EditarUsuarioPage from './pages/editar/EditarUsuarioPage';
 import MisMazosPage from './pages/misMazos/MisMazosPage';
 import CrearMazoPage from './pages/misMazos/CrearMazoPage';
 import StatPage from './pages/stat/StatPage';
+import GamePage from './pages/game/GamePage';
 
 function App() {
   const [token, setToken] = useState(null);
@@ -87,6 +88,9 @@ function App() {
         <Route path="/editar-usuario" element={<EditarUsuarioPage />} />
         <Route path="/mis-mazos" element={<MisMazosPage />} />
         <Route path="/crear-mazo" element={<CrearMazoPage />} />
+
+        <Route path="/jugar/:id" element={<GamePage />} />
+       
       </Routes>
       <FooterComponent />
     </div>

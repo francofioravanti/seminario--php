@@ -1,0 +1,399 @@
+.game-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.game-board {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 120px);
+  padding: 20px;
+  border-radius: 15px;
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Área del servidor - Cartas más grandes y mejor alineadas */
+.server-area {
+  text-align: center;
+  margin-bottom: 0px;
+  padding: 5px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.server-area h3 {
+  color: rgb(15, 13, 13);
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.server-cards {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding: 10px;
+}
+
+.server-card {
+  position: relative;
+  width: 100px; /* Más grande que antes (era 80px) */
+  height: 140px; /* Más grande que antes (era 120px) */
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+  border: 2px solid rgba(255,255,255,0.3);
+  transition: transform 0.2s ease;
+}
+
+.server-card:hover {
+  transform: translateY(-3px);
+}
+
+.card-back {
+  width: 100%;
+  height: 75%;
+  object-fit: cover;
+}
+
+.card-attribute {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7));
+  color: white;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Centro del tablero */
+.battle-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 50px 0;
+  min-height: 200px;
+}
+
+.battle-cards {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  background: rgba(255,255,255,0.95);
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  border: 2px solid rgba(255,255,255,0.8);
+}
+
+.played-card {
+  text-align: center;
+}
+
+.vs-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
+}
+
+.vs-section h3 {
+  font-size: 2.5em;
+  color: #ff6b6b;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.round-result h4 {
+  color: #4ecdc4;
+  margin: 5px 0;
+  font-size: 1.3em;
+}
+
+.round-result p {
+  color: #666;
+  font-weight: bold;
+}
+
+.server-card-revealed {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid #dee2e6;
+  min-width: 140px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Área del usuario - Cartas más pequeñas y compactas */
+.user-area {
+  text-align: center;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.user-area h3 {
+  color: rgb(0, 0, 0);
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.user-cards {
+  display: flex;
+  justify-content: center;
+  gap: 8px; /* Reducido de 12px */
+  flex-wrap: wrap;
+  padding: 10px;
+}
+
+/* Cartas del usuario más pequeñas y compactas */
+.user-card {
+  background: white;
+  border-radius: 10px;
+  padding: 10px; /* Reducido de 12px */
+  width: 160px; /* Reducido de 200px */
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border: 2px solid #e9ecef;
+}
+
+.user-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  border-color: #667eea;
+}
+
+.carta-imagen {
+  text-align: center;
+  margin-bottom: 10px; /* Reducido de 15px */
+}
+
+.carta-imagen img {
+  width: 60px; /* Reducido de 80px */
+  height: 60px; /* Reducido de 80px */
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #f8f9fa;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.carta-nombre {
+  font-size: 1rem; /* Reducido de 1.1rem */
+  font-weight: bold;
+  color: #333;
+  margin: 6px 0; /* Reducido de 8px */
+  text-align: center;
+}
+
+.carta-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Reducido de 6px */
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px; /* Reducido de 6px 10px */
+  background: #f8f9fa;
+  border-radius: 4px; /* Reducido de 6px */
+  border-left: 2px solid #667eea; /* Reducido de 3px */
+}
+
+.stat-label {
+  font-weight: 600;
+  color: rgb(55 42 255 / 87%);
+  font-size: 0.7rem; /* Reducido de 0.8rem */
+}
+
+.stat-value {
+  font-weight: bold;
+  color: #333;
+  font-size: 0.8rem; /* Reducido de 0.9rem */
+}
+
+/* Badges de tipos - aún más pequeños */
+.tipo-badge {
+  padding: 2px 4px; /* Reducido de 3px 6px */
+  border-radius: 8px; /* Reducido de 10px */
+  font-size: 0.6rem; /* Reducido de 0.7rem */
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white !important;
+}
+
+.tipo-fuego { background-color: #ff6b6b; }
+.tipo-agua { background-color: #4ecdc4; }
+.tipo-eléctrico { background-color: #ffe66d; color: #333 !important; }
+.tipo-planta { background-color: #95e1d3; color: #333 !important; }
+.tipo-psíquico { background-color: #a8e6cf; color: #333 !important; }
+.tipo-tierra { background-color: #d4a574; }
+.tipo-volador { background-color: #87ceeb; color: #333 !important; }
+.tipo-veneno { background-color: #dda0dd; color: #333 !important; }
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  min-width: 120px;
+}
+
+.card img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.card h5 {
+  margin: 5px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.card p {
+  margin: 3px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+/* Resultado del juego */
+.game-result {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  z-index: 1000;
+  border: 2px solid #667eea;
+}
+
+.play-again-btn, .btn-back {
+  background: #4ecdc4;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 10px 5px;
+  transition: background 0.2s;
+}
+
+.play-again-btn:hover, .btn-back:hover {
+  background: #45b7aa;
+}
+
+/* Estados de carga y error */
+.game-loading, .game-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+  color: white;
+}
+
+.game-error {
+  color: #ff6b6b;
+}
+
+/* Responsive mejorado */
+@media (max-width: 1024px) {
+  .game-board {
+    max-width: 100%;
+    padding: 15px;
+  }
+  
+  .battle-cards {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .vs-section {
+    padding: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .user-cards, .server-cards {
+    gap: 8px;
+  }
+  
+  .user-card {
+    width: 180px;
+  }
+  
+  .server-card {
+    width: 85px;
+    height: 120px;
+  }
+  
+  .carta-imagen img {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .carta-nombre {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .server-cards {
+    gap: 5px;
+  }
+  
+  .user-card {
+    width: 160px;
+  }
+  
+  .server-card {
+    width: 70px;
+    height: 100px;
+  }
+}
+
+.game-error {
+  background: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+}
+
+.game-board {
+  width: 90%;
+  height: 70%;
+  /* NO pongas background aquí para que se vea la imagen */
+  border-radius: 15px;
+  padding: 2rem;
+  margin-top: 2rem;
+  /* backdrop-filter: blur(10px); - Comentar esto también */
+}
