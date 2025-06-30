@@ -188,8 +188,11 @@ const GamePage = () => {
       <p>Ronda {gameState.currentRound} de {mazoInfo?.cartas.length}</p>
 
       <div className="server-cards">
-        {gameState.userCards.map((_, idx) => (
-          <img key={idx} src={cartaServidorDorso} alt="Carta del servidor" className="server-card-back" />
+        {gameState.serverCards.map((card, idx) => (
+          <div key={idx} className="server-card">
+            <img src={cartaServidorDorso} alt="Carta del servidor" className="server-card-back" />
+            <div className="card-attribute">{card.atributo}</div>
+          </div>
         ))}
       </div>
 
