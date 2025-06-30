@@ -32,9 +32,9 @@ function EditarUsuarioPage() {
     e.preventDefault();
 
     const token = localStorage.getItem('token');
-    const usuario = localStorage.getItem('username');
+    const userId = localStorage.getItem('userId');
 
-    if (!token || !usuario) {
+    if (!token || !userId) {
       setErrores(["No estás logueado."]);
       return;
     }
@@ -42,7 +42,7 @@ function EditarUsuarioPage() {
     if (!validarFormulario()) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/usuarios/${usuario}`, {
+      const response = await fetch(`http://localhost:8000/usuarios/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -56,9 +56,14 @@ function EditarUsuarioPage() {
       if (response.ok) {
         setMensaje("Usuario actualizado correctamente.");
         setErrores([]);
+        localStorage.setItem('username', nombre); // Actualiza localStorage
       } else {
         setMensaje('');
-        setErrores([data.error || "Error al actualizar."]);
+        if (data.errores) {
+          setErrores(data.errores);
+        } else {
+          setErrores([data.error || "Error al actualizar."]);
+        }
       }
     } catch (err) {
       setMensaje('');
@@ -93,7 +98,7 @@ function EditarUsuarioPage() {
             value={repetirPassword}
             onChange={(e) => setRepetirPassword(e.target.value)}
           />
-          
+
           <button type="submit">Guardar cambios</button>
         </form>
 

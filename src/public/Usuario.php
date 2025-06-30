@@ -106,6 +106,15 @@ class Usuario{
         return $stmt->execute();
     }
 
+    public function actualizarCredencialesPorId(int $id, string $nombre, string $clave): bool {
+    $db = (new Conexion())->getDb();
+    $query = "UPDATE usuario SET nombre = :nombre, password = :password WHERE id = :id";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':nombre', $nombre);
+    $stmt->bindParam(':password', $clave);
+    $stmt->bindParam(':id', $id);
+    return $stmt->execute();
+}
     
     public function info($id): array {
     $db = (new Conexion())->getDb();

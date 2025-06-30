@@ -1,171 +1,57 @@
+/* Fondo del tablero */
 .game-page {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   padding: 20px;
+  color: white;
 }
 
-.game-board {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: calc(100vh - 120px);
-  padding: 20px;
-  border-radius: 15px;
-  position: relative;
-  max-width: 1200px;
-  margin: 0 auto;
+.game-page h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: #fff;
 }
 
-/* Área del servidor - Cartas más grandes y mejor alineadas */
-.server-area {
-  text-align: center;
-  margin-bottom: 0px;
-  padding: 5px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-}
-
-.server-area h3 {
-  color: rgb(15, 13, 13);
-  margin-bottom: 15px;
-  font-size: 1.2rem;
-}
-
+/* Cartas del servidor */
 .server-cards {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  flex-wrap: wrap;
-  padding: 10px;
+  gap: 12px;
+  margin-bottom: 1rem;
 }
 
-.server-card {
-  position: relative;
-  width: 100px; /* Más grande que antes (era 80px) */
-  height: 140px; /* Más grande que antes (era 120px) */
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-  border: 2px solid rgba(255,255,255,0.3);
-  transition: transform 0.2s ease;
-}
-
-.server-card:hover {
-  transform: translateY(-3px);
-}
-
-.card-back {
-  width: 100%;
-  height: 75%;
+.server-card-back {
+  width: 100px;
+  height: 140px;
   object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
 
-.card-attribute {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7));
-  color: white;
-  padding: 8px;
-  font-size: 13px;
-  font-weight: bold;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Centro del tablero */
-.battle-area {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 50px 0;
-  min-height: 200px;
-}
-
-.battle-cards {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  background: rgba(255,255,255,0.95);
-  padding: 25px;
-  border-radius: 20px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-  border: 2px solid rgba(255,255,255,0.8);
-}
-
-.played-card {
-  text-align: center;
-}
-
-.vs-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 0 20px;
-}
-
-.vs-section h3 {
-  font-size: 2.5em;
-  color: #ff6b6b;
-  margin: 0;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-}
-
-.round-result h4 {
-  color: #4ecdc4;
-  margin: 5px 0;
-  font-size: 1.3em;
-}
-
-.round-result p {
-  color: #666;
-  font-weight: bold;
-}
-
-.server-card-revealed {
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-  padding: 20px;
-  border-radius: 12px;
-  border: 2px solid #dee2e6;
-  min-width: 140px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-/* Área del usuario - Cartas más pequeñas y compactas */
+/* Cartas del usuario */
 .user-area {
   text-align: center;
   padding: 15px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-}
-
-.user-area h3 {
-  color: rgb(0, 0, 0);
-  margin-bottom: 15px;
-  font-size: 1.2rem;
+  margin-top: 1rem;
 }
 
 .user-cards {
   display: flex;
   justify-content: center;
-  gap: 8px; /* Reducido de 12px */
+  gap: 12px;
   flex-wrap: wrap;
   padding: 10px;
 }
 
-/* Cartas del usuario más pequeñas y compactas */
 .user-card {
   background: white;
   border-radius: 10px;
-  padding: 10px; /* Reducido de 12px */
-  width: 160px; /* Reducido de 200px */
+  padding: 10px;
+  width: 160px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
@@ -180,12 +66,12 @@
 
 .carta-imagen {
   text-align: center;
-  margin-bottom: 10px; /* Reducido de 15px */
+  margin-bottom: 10px;
 }
 
 .carta-imagen img {
-  width: 60px; /* Reducido de 80px */
-  height: 60px; /* Reducido de 80px */
+  width: 60px;
+  height: 60px;
   object-fit: cover;
   border-radius: 50%;
   border: 2px solid #f8f9fa;
@@ -193,46 +79,46 @@
 }
 
 .carta-nombre {
-  font-size: 1rem; /* Reducido de 1.1rem */
+  font-size: 1rem;
   font-weight: bold;
   color: #333;
-  margin: 6px 0; /* Reducido de 8px */
+  margin: 6px 0;
   text-align: center;
 }
 
 .carta-stats {
   display: flex;
   flex-direction: column;
-  gap: 4px; /* Reducido de 6px */
+  gap: 4px;
 }
 
 .stat-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 8px; /* Reducido de 6px 10px */
+  padding: 4px 8px;
   background: #f8f9fa;
-  border-radius: 4px; /* Reducido de 6px */
-  border-left: 2px solid #667eea; /* Reducido de 3px */
+  border-radius: 4px;
+  border-left: 2px solid #667eea;
 }
 
 .stat-label {
   font-weight: 600;
   color: rgb(55 42 255 / 87%);
-  font-size: 0.7rem; /* Reducido de 0.8rem */
+  font-size: 0.7rem;
 }
 
 .stat-value {
   font-weight: bold;
   color: #333;
-  font-size: 0.8rem; /* Reducido de 0.9rem */
+  font-size: 0.8rem;
 }
 
-/* Badges de tipos - aún más pequeños */
+/* Tipos de atributo */
 .tipo-badge {
-  padding: 2px 4px; /* Reducido de 3px 6px */
-  border-radius: 8px; /* Reducido de 10px */
-  font-size: 0.6rem; /* Reducido de 0.7rem */
+  padding: 2px 4px;
+  border-radius: 8px;
+  font-size: 0.6rem;
   font-weight: bold;
   text-transform: uppercase;
   color: white !important;
@@ -247,51 +133,84 @@
 .tipo-volador { background-color: #87ceeb; color: #333 !important; }
 .tipo-veneno { background-color: #dda0dd; color: #333 !important; }
 
-.card {
-  background: white;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  min-width: 120px;
+/* BATALLA */
+.battle-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 40px auto;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 20px;
+  width: fit-content;
+  max-width: 100%;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  color: white;
 }
 
-.card img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 50%;
+.battle-title {
+  text-align: center;
   margin-bottom: 10px;
 }
 
-.card h5 {
-  margin: 5px 0;
-  color: #333;
-  font-size: 1.1rem;
+.battle-cards {
+  display: flex;
+  align-items: center;
+  gap: 30px;
 }
 
-.card p {
-  margin: 3px 0;
-  font-size: 14px;
-  color: #666;
+.played-card {
+  text-align: center;
+}
+
+.played-card h4 {
+  margin-bottom: 5px;
+  color: #4ecdc4;
+}
+
+.played-card p {
+  margin: 2px 0;
+}
+
+.vs-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
+}
+
+.vs-section h3 {
+  font-size: 2.5em;
+  color: #ff6b6b;
+  margin: 0;
+}
+
+.round-result h4 {
+  color: #ffe66d;
+  margin: 5px 0;
+  font-size: 1.3em;
+}
+
+.round-result p {
+  color: #fff;
+  font-weight: bold;
 }
 
 /* Resultado del juego */
 .game-result {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  margin: 20px auto;
   background: white;
   color: #333;
   padding: 30px;
   border-radius: 15px;
   text-align: center;
   box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-  z-index: 1000;
   border: 2px solid #667eea;
+  max-width: 500px;
 }
 
-.play-again-btn, .btn-back {
+.play-again-btn {
   background: #4ecdc4;
   color: white;
   border: none;
@@ -299,12 +218,12 @@
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
-  margin: 10px 5px;
+  margin-top: 10px;
   transition: background 0.2s;
 }
 
-.play-again-btn:hover, .btn-back:hover {
-  background: #45b7aa;
+.play-again-btn:hover {
+  background: #3bbeb4;
 }
 
 /* Estados de carga y error */
@@ -320,81 +239,4 @@
 
 .game-error {
   color: #ff6b6b;
-}
-
-/* Responsive mejorado */
-@media (max-width: 1024px) {
-  .game-board {
-    max-width: 100%;
-    padding: 15px;
-  }
-  
-  .battle-cards {
-    flex-direction: column;
-    gap: 20px;
-    padding: 20px;
-  }
-  
-  .vs-section {
-    padding: 0;
-  }
-}
-
-@media (max-width: 768px) {
-  .user-cards, .server-cards {
-    gap: 8px;
-  }
-  
-  .user-card {
-    width: 180px;
-  }
-  
-  .server-card {
-    width: 85px;
-    height: 120px;
-  }
-  
-  .carta-imagen img {
-    width: 70px;
-    height: 70px;
-  }
-  
-  .carta-nombre {
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .user-cards {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .server-cards {
-    gap: 5px;
-  }
-  
-  .user-card {
-    width: 160px;
-  }
-  
-  .server-card {
-    width: 70px;
-    height: 100px;
-  }
-}
-
-.game-error {
-  background: rgba(255, 0, 0, 0.1);
-  border: 1px solid rgba(255, 0, 0, 0.3);
-}
-
-.game-board {
-  width: 90%;
-  height: 70%;
-  /* NO pongas background aquí para que se vea la imagen */
-  border-radius: 15px;
-  padding: 2rem;
-  margin-top: 2rem;
-  /* backdrop-filter: blur(10px); - Comentar esto también */
 }

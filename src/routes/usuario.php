@@ -94,7 +94,7 @@ $app->post('/login', function (Request $request, Response $response) {
 
 
     
-    $app->put('/usuarios/{usuario}', function (Request $request, Response $response, array $args) {
+    $app->put('/usuarios/{id}', function (Request $request, Response $response, array $args) {
     $data = $request->getParsedBody();
     $errores = [];
 
@@ -114,20 +114,14 @@ $app->post('/login', function (Request $request, Response $response) {
     $nombre = $data['nombre'];
     $clave = $data['clave'];
 
-    $usuarioLogueadoUsername = $request->getAttribute('usuario');
+    $usuarioLogueadoId = $request->getAttribute('usuario'); // ID desde el token
+    $usuarioEnUrl = (int) $args['id'];
 
-    if (!$usuarioLogueadoUsername) {
-        $response->getBody()->write(json_encode(['error' => 'No está logueado']));
-        return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
-    }
-
-    $usuarioEnUrl = $args['usuario'];
-
-    if ($usuarioLogueadoUsername !== $usuarioEnUrl) {
+    if (!$usuarioLogueadoId || $usuarioEnUrl !== $usuarioLogueadoId) {
         $response->getBody()->write(json_encode([
-            'logueado_id' => $usuarioLogueadoUsername,
-            'url_id' => $usuarioEnUrl,
-            'error' => 'No tiene permisos para modificar este usuario'
+            'error' => 'No tiene permisos para modificar este usuario',
+            'logueado_id' => $usuarioLogueadoId,
+            'url_id' => $usuarioEnUrl
         ]));
         return $response->withStatus(403)->withHeader('Content-Type', 'application/json');
     }
@@ -139,8 +133,8 @@ $app->post('/login', function (Request $request, Response $response) {
         $errores[] = 'La nueva clave no cumple las condiciones.';
     }
 
-    if (!$servicio->validarNombreUsuario($nombre, $erroresValidacion)) {
-        $errores[] = 'El nuevo nombre no cumple las condiciones.';
+    if (strlen($nombre) < 1 || strlen($nombre) > 30) {
+        $errores[] = 'El nuevo nombre debe tener entre 1 y 30 caracteres.';
     }
 
     if (!empty($errores)) {
@@ -148,7 +142,7 @@ $app->post('/login', function (Request $request, Response $response) {
         return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
     }
 
-    if ($servicio->actualizarCredencialesPorNombre($usuarioLogueadoUsername, $nombre, $clave)) {
+    if ($servicio->actualizarCredencialesPorId($usuarioLogueadoId, $nombre, $clave)) {
         $response->getBody()->write(json_encode(['exito' => 'Se actualizó el usuario correctamente']));
         return $response->withHeader('Content-Type', 'application/json');
     } else {

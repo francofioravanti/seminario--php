@@ -87,5 +87,31 @@ $app->get('/usuarios/{usuario}/partidas/{partida}/cartas', function (Request $re
 })->add(IsLoggedMiddleware::class);
 
 
+    $app->get('/partida/en-curso', function (Request $request, Response $response) {
+    $usuarioLogueadoId = $request->getAttribute('usuario');
+
+    $partida = new Partida();
+    $db = (new \Conexion())->getDb();
+
+    $stmt = $db->prepare("SELECT * FROM partida WHERE estado = 'en_curso' LIMIT 1");
+    $stmt->execute();
+    $partidaEnCurso = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$partidaEnCurso) {
+        $response->getBody()->write(json_encode(['partida' => null]));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+  
+    $esPropia = $partidaEnCurso['usuario_id'] == $usuarioLogueadoId;
+
+    $response->getBody()->write(json_encode([
+        'partida' => $partidaEnCurso,
+        'es_propia' => $esPropia
+    ]));
+    return $response->withHeader('Content-Type', 'application/json');
+})->add(IsLoggedMiddleware::class);
+
+
 }
 ?>
