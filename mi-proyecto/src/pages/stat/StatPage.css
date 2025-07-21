@@ -60,7 +60,8 @@
   padding: 8px 15px;
   border: 2px solid #e9ecef;
   border-radius: 8px;
-  background: white;
+  background: #F8F9FA; 
+  color: #212529;
   font-size: 1rem;
   cursor: pointer;
   transition: border-color 0.3s ease;

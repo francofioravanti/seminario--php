@@ -69,9 +69,12 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
+    localStorage.removeItem('userId');
     setToken(null);
     setUsername(null);
-    navigate('/'); // Redirige a la página de inicio
+    
+    sessionStorage.clear();
+    navigate('/'); 
   };
 
   return (

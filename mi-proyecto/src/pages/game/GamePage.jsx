@@ -11,6 +11,7 @@ const GamePage = () => {
   const [error, setError] = useState(null);
   const [partidaId, setPartidaId] = useState(null);
   const [ganadorFinal, setGanadorFinal] = useState(null);
+  const [isBlocked, setIsBlocked] = useState(false); // 🔒 Nuevo estado para bloquear jugadas
   const [gameState, setGameState] = useState({
     userCards: [],
     playedUserCard: null,
@@ -114,9 +115,11 @@ const GamePage = () => {
   };
 
   const playCard = async (userCard) => {
-    if (gameState.playedUserCard || gameState.gameFinished || !partidaId) return;
+    if (gameState.playedUserCard || gameState.gameFinished || !partidaId || isBlocked) return;
 
     try {
+      setIsBlocked(true); // 🔒 Bloquear jugada
+
       const jugadaResp = await axios.post('http://localhost:8000/jugadas', {
         carta_id: userCard.id,
         partida_id: partidaId
@@ -156,10 +159,12 @@ const GamePage = () => {
             gameFinished
           };
         });
+        setIsBlocked(false); // 🔓 Desbloquear jugada
       }, 3000);
     } catch (error) {
       console.error('Error al jugar carta:', error);
       setError('No se pudo procesar la jugada.');
+      setIsBlocked(false);
     }
   };
 
@@ -222,7 +227,11 @@ const GamePage = () => {
         <h3>Tus Cartas</h3>
         <div className="user-cards">
           {gameState.userCards.map(carta => (
-            <div key={carta.id} onClick={() => playCard(carta)} className="user-card">
+            <div
+              key={carta.id}
+              onClick={() => !isBlocked && playCard(carta)}
+              className={`user-card ${isBlocked ? 'deshabilitada' : ''}`} // 🔒 clase para feedback visual
+            >
               <div className="carta-imagen">
                 <img src={obtenerImagenPokemon(carta.nombre)} onError={(e) => { e.target.src = '/flame.svg'; }} alt={carta.nombre} />
               </div>

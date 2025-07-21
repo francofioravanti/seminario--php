@@ -6,7 +6,7 @@ function StatPage() {
   const [estadisticas, setEstadisticas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [ordenamiento, setOrdenamiento] = useState('mejor'); // 'mejor' o 'peor'
+  const [ordenamiento, setOrdenamiento] = useState('mejor'); 
   const [paginaActual, setPaginaActual] = useState(1);
   const resultadosPorPagina = 5;
 
@@ -19,7 +19,7 @@ function StatPage() {
       setLoading(true);
       const response = await axios.get('http://localhost:8000/estadisticas');
       
-      // Procesar datos y calcular estadísticas
+      
       const datosFormateados = Object.entries(response.data).map(([nombre, stats]) => {
         const totalPartidas = stats.ganó + stats.perdió + stats.empató;
         const promedio = totalPartidas > 0 ? (stats.ganó / totalPartidas * 100).toFixed(2) : 0;
