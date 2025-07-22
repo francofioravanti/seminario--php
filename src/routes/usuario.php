@@ -94,7 +94,7 @@ $app->post('/login', function (Request $request, Response $response) {
 
 
     
-    $app->put('/usuarios/{id}', function (Request $request, Response $response, array $args) {
+   $app->put('/usuarios/{id}', function (Request $request, Response $response, array $args) {
     $data = $request->getParsedBody();
     $errores = [];
 
@@ -114,7 +114,8 @@ $app->post('/login', function (Request $request, Response $response) {
     $nombre = $data['nombre'];
     $clave = $data['clave'];
 
-    $usuarioLogueadoId = $request->getAttribute('usuario'); // ID desde el token
+    
+    $usuarioLogueadoId = (int) $request->getAttribute('usuario');
     $usuarioEnUrl = (int) $args['id'];
 
     if (!$usuarioLogueadoId || $usuarioEnUrl !== $usuarioLogueadoId) {

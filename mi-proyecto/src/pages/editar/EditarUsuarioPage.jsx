@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './EditarUsuarioPage.css';
 
 function EditarUsuarioPage() {
@@ -7,6 +7,34 @@ function EditarUsuarioPage() {
   const [repetirPassword, setRepetirPassword] = useState('');
   const [mensaje, setMensaje] = useState('');
   const [errores, setErrores] = useState([]);
+
+  const token = localStorage.getItem('token');
+  const userId = Number(localStorage.getItem('userId'));
+
+  useEffect(() => {
+    const cargarNombre = async () => {
+      if (!token || !userId) return;
+
+      try {
+        const response = await fetch(`http://localhost:8000/usuarios/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+        if (response.ok && data.nombre) {
+          setNombre(data.nombre); // ✅ precarga el nombre
+        } else {
+          setErrores([data.error || 'No se pudo cargar el nombre del usuario.']);
+        }
+      } catch {
+        setErrores(['Error al obtener los datos del usuario.']);
+      }
+    };
+
+    cargarNombre();
+  }, [token, userId]);
 
   const validarFormulario = () => {
     const nuevosErrores = [];
@@ -31,9 +59,6 @@ function EditarUsuarioPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem('token');
-    const userId = localStorage.getItem('userId');
-
     if (!token || !userId) {
       setErrores(["No estás logueado."]);
       return;
@@ -56,14 +81,10 @@ function EditarUsuarioPage() {
       if (response.ok) {
         setMensaje("Usuario actualizado correctamente.");
         setErrores([]);
-        localStorage.setItem('username', nombre); // Actualiza localStorage
+        localStorage.setItem('username', nombre);
       } else {
         setMensaje('');
-        if (data.errores) {
-          setErrores(data.errores);
-        } else {
-          setErrores([data.error || "Error al actualizar."]);
-        }
+        setErrores(data.errores || [data.error || "Error al actualizar."]);
       }
     } catch (err) {
       setMensaje('');
@@ -98,7 +119,6 @@ function EditarUsuarioPage() {
             value={repetirPassword}
             onChange={(e) => setRepetirPassword(e.target.value)}
           />
-
           <button type="submit">Guardar cambios</button>
         </form>
 

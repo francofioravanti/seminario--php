@@ -2,12 +2,17 @@
 class Mazo{
 
 
-    public function crearMazo(int $usuario_id, string $nombreMazo, array $cartas) {
+  public function crearMazo(int $usuario_id, string $nombreMazo, array $cartas) {
     $db = (new Conexion())->getDb();
+
+    if (count($cartas) === 0) {
+        return 'Debe seleccionar al menos una carta para crear el mazo.';
+    }
 
     if (count($cartas) !== count(array_unique($cartas))) {
         return 'Las cartas deben tener IDs distintos.';
     }
+
     if (count($cartas) > 5) {
         return 'Solo se permiten 5 cartas como máximo.';
     }
@@ -30,46 +35,46 @@ class Mazo{
         return "Ya tenés 3 mazos creados.";
     }
 
+   
     $query = "INSERT INTO mazo (usuario_id, nombre) VALUES (:usuario_id, :nombre)";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':usuario_id', $usuario_id);
     $stmt->bindParam(':nombre', $nombreMazo);
     $stmt->execute();
-    $mazoid = $db->lastInsertId();
+    $mazoId = $db->lastInsertId();
 
-    if ($mazoid) {
-    if (count($cartas) > 0) {
-        $estado = 'en_mazo';
-        $insertQuery = "INSERT INTO mazo_carta (mazo_id, carta_id, estado) VALUES ";
-        $values = [];
-        $params = [];
-
-        foreach ($cartas as $i => $cartaId) {
-            $values[] = "(:mazo_id_$i, :carta_id_$i, :estado_$i)";
-            $params[":mazo_id_$i"] = $mazoid;
-            $params[":carta_id_$i"] = $cartaId;
-            $params[":estado_$i"] = $estado;
-        }
-
-        $insertQuery .= implode(', ', $values);
-
-        $stmt = $db->prepare($insertQuery);
-
-        foreach ($params as $param => $value) {
-            $stmt->bindValue($param, $value);
-        }
-
-        $exito = $stmt->execute();
-        if (!$exito) {
-            return "No se pudo crear el mazo";
-        }
+    if (!$mazoId) {
+        return "No se pudo crear el mazo.";
     }
-    
-    
-    return ['mazo_id' => $mazoid, 'nombre' => $nombreMazo];
+
+  
+    $estado = 'en_mazo';
+    $insertQuery = "INSERT INTO mazo_carta (mazo_id, carta_id, estado) VALUES ";
+    $values = [];
+    $params = [];
+
+    foreach ($cartas as $i => $cartaId) {
+        $values[] = "(:mazo_id_$i, :carta_id_$i, :estado_$i)";
+        $params[":mazo_id_$i"] = $mazoId;
+        $params[":carta_id_$i"] = $cartaId;
+        $params[":estado_$i"] = $estado;
+    }
+
+    $insertQuery .= implode(', ', $values);
+    $stmt = $db->prepare($insertQuery);
+    foreach ($params as $key => $val) {
+        $stmt->bindValue($key, $val);
+    }
+
+    if (!$stmt->execute()) {
+        return "No se pudo guardar las cartas del mazo.";
+    }
+
+    return ['mazo_id' => $mazoId, 'nombre' => $nombreMazo];
 }
 
-}
+
+
 
   public function eliminarMazo($mazoId): array {
     $db = (new Conexion())->getDb();

@@ -24,10 +24,10 @@ const CrearMazoPage = () => {
     };
   };
 
-  // Cargar atributos al inicio
+ 
   const cargarAtributos = async () => {
     try {
-      // Usar atributos hardcodeados temporalmente
+     
       setAtributos([
         { id: 1, nombre: 'Fuego' },
         { id: 2, nombre: 'Agua' },
@@ -40,7 +40,7 @@ const CrearMazoPage = () => {
     }
   };
 
-  // Cargar todas las cartas al inicio
+
   const cargarTodasLasCartas = async () => {
     try {
       const response = await axios.get('http://localhost:8000/cartas', {
@@ -92,7 +92,7 @@ const CrearMazoPage = () => {
     verificarLimiteDeMazos();
   }, [navigate]);
 
-  // Función para buscar cartas con filtros en el backend
+  
   const buscarCartasConFiltros = async () => {
     try {
       const params = new URLSearchParams();
@@ -119,7 +119,7 @@ const CrearMazoPage = () => {
     }
   };
   
-  // Aplicar filtros cuando cambien los valores
+  
   useEffect(() => {
     buscarCartasConFiltros();
   }, [filtroNombre, filtroAtributo]);
@@ -130,9 +130,9 @@ const CrearMazoPage = () => {
     setCartasFiltradas(cartas);
   };
   
-  // Función corregida para selección individual de cartas
+  
   const alternarCarta = (carta) => {
-    // Usar la misma lógica que en el renderizado
+    
     const cartaId = carta.id || `${carta.nombre}-${carta.atributo}`;
     
     const yaSeleccionada = cartasSeleccionadas.find(c => {
@@ -189,10 +189,10 @@ const CrearMazoPage = () => {
       }
       // Solo IDs únicos de cartas
       console.log('Cartas seleccionadas:', cartasSeleccionadas); // <-- Agrega esto
-      const cartasIds = [...new Set(cartasSeleccionadas.filter(carta => typeof carta.id === 'number').map(carta => carta.id))];
+      const cartasIds = [...new Set(cartasSeleccionadas.map(carta => carta.id))];
       const datosParaEnviar = {
-        nombre: nombreMazo.trim(),
-        cartas: cartasIds
+      nombre: nombreMazo.trim(),
+      cartas: cartasIds
       };
       console.log('Datos que se enviarán al backend:', datosParaEnviar); //
       await axios.post('http://localhost:8000/mazos', datosParaEnviar, {
